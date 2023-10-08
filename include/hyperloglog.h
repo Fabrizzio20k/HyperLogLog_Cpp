@@ -5,7 +5,7 @@
 #include <vector>
 #include <cmath>
 #include <bitset>
-#include "MurmurHash3.h"
+#include "../lib/MurmurHash3.h"
 
 using namespace std;
 

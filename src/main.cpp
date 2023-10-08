@@ -4,7 +4,7 @@
 
 int main()
 {
-    std::ifstream archivo("miarchivo.csv");
+    std::ifstream archivo("../mock/MOCK_DATA.csv");
 
     if (!archivo.is_open())
     {

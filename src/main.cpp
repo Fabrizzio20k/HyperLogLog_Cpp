@@ -1,27 +1,10 @@
-#include <fstream>
-#include <iostream>
-#include <string>
+#include "hyperloglog.h"
 
 int main()
 {
-    std::ifstream archivo("../mock/MOCK_DATA.csv");
+    HyperLogLog hll(16);
+    hll.count_from_csv("../mock/esas_mehsullar.csv", "satish_kodu");
+    cout << hll.count() << endl;
 
-    if (!archivo.is_open())
-    {
-        std::cout << "No se pudo abrir el archivo" << std::endl;
-        return 1;
-    }
-
-    std::string linea;
-    if (std::getline(archivo, linea))
-    {
-        std::cout << "La primera línea es: " << linea << std::endl;
-    }
-    else
-    {
-        std::cout << "El archivo está vacío o no se pudo leer la línea" << std::endl;
-    }
-
-    archivo.close();
     return 0;
 }

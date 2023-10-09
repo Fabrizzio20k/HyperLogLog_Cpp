@@ -5,19 +5,11 @@
 #include <vector>
 #include <cmath>
 #include <bitset>
-#include "../lib/MurmurHash3.h"
+#include <fstream>
+#include <sstream>
+#include "MurmurHash3.h"
 
 using namespace std;
-
-bitset<32> hash_bin(const string &data)
-{
-    uint32_t hash;
-    MurmurHash3_x86_32(data.c_str(), data.size(), 0, &hash);
-
-    bitset<32> hash_bin(hash);
-
-    return hash_bin;
-}
 
 class HyperLogLog
 {
@@ -27,7 +19,7 @@ private:
     vector<int> M; // Vector de buckets
     double alpha;  // Valor de correccion de acuerdo al paper
 
-    int get_rho(bitset<32> hash_bin) // Nos da la cantidad de ceros consecutivos antes del primer 1
+    static int get_rho(bitset<32> hash_bin) // Nos da la cantidad de ceros consecutivos antes del primer 1
     {
         int rho = 0;
         for (int i = 0; i < 32; i++)
@@ -63,22 +55,22 @@ private:
     }
 
 public:
-    HyperLogLog(int _p) // Los valores de p van desde 4 hasta 16 segun el paper
+    explicit HyperLogLog(int _p) // Los valores de p van desde 4 hasta 16 segun el paper
     {
         this->p = _p;                // Valor de precision
         this->m = 1 << p;            // 2^p buckets, movemos 1 p veces a la izquierda para obtener el valor de 2^p
         this->M = vector<int>(m, 0); // Inicializamos el vector de buckets con 0
 
         alpha = (m == 16) ? 0.673 : (m == 32) ? 0.697
-                                : (m == 64)   ? 0.709
-                                              : 0.7213 / (1 + 1.079 / m); // Valor de correccion de acuerdo al paper
+                                              : (m == 64)   ? 0.709
+                                                            : 0.7213 / (1 + 1.079 / m); // Valor de correccion de acuerdo al paper
 
         cout << "p: " << p << endl;
         cout << "m: " << m << endl;
         cout << "alpha: " << alpha << endl;
     }
 
-    double estimate() // Calcula la estimacion de acuerdo al paper
+    double count() // Calcula la estimacion de acuerdo al paper
     {
         double Z = 0;
         for (int i = 0; i < m; i++)
@@ -88,27 +80,29 @@ public:
 
         double E = alpha * m * m / Z;
 
-        if (E <= 5.0 / 2.0 * m) // Pequeño rango de correccion
+        if (E <= (5.0 / 2.0) * m) // Pequeño rango de correccion
         {
             int V = countZeroRegisters();
             if (V != 0)
             {
-                E = m * log((double)m / (double)V);
+                E = linearCounting();
             }
         }
-        else if (E > 1.0 / 30.0 * pow(2, 32)) // Gran rango de correccion
+        else if (E > (1.0 / 30.0) * pow(2, 32)) // Gran rango de correccion
         {
             E = -pow(2, 32) * log(1 - E / pow(2, 32));
         }
 
-        return E;
+        return E * 2;
     }
 
     void add(const string &data) // Agrega un elemento al vector de buckets
     {
-        bitset<32> hash_final = hash_bin(data);
-        uint32_t idx = hash_final.to_ulong() >> (32 - p);           // Tomamos los p bits mas significativos del hash
-        uint32_t w = hash_final.to_ulong() & ((1 << (32 - p)) - 1); // Tomamos los 32 - p bits menos significativos del hash
+        uint32_t hash;
+        MurmurHash3_x86_32(data.c_str(), data.size(), 313, &hash);
+
+        uint32_t idx = hash >> (32 - p);           // Tomamos los p bits mas significativos del hash
+        uint32_t w = hash & ((1 << (32 - p)) - 1); // Tomamos los 32 - p bits menos significativos del hash
         int rho = get_rho(w);
         M[idx] = max(M[idx], rho);
     }
@@ -119,6 +113,61 @@ public:
             M[i] = max(M[i], hll.M[i]);
         }
     }
+
+    void clear() // Limpia el vector de buckets
+    {
+        for (int i = 0; i < m; i++)
+        {
+            M[i] = 0;
+        }
+    }
+
+    void count_from_csv(const string& nombreArchivo, const string& nombreColumna){
+
+        clear();
+
+        ifstream archivo(nombreArchivo);
+        if (!archivo.is_open()) {
+            cout << "No se pudo abrir el archivo" << std::endl;
+            return;
+        }
+
+        string linea;
+        getline(archivo, linea);
+        istringstream ss(linea);
+
+        vector<string> encabezados;
+        string encabezado;
+        while (std::getline(ss, encabezado, ',')) {
+            encabezados.push_back(encabezado);
+        }
+
+        int indiceColumna = -1;
+        for (int i = 0; i < encabezados.size(); i++) {
+            if (encabezados[i] == nombreColumna) {
+                indiceColumna = i;
+                break;
+            }
+        }
+
+        if (indiceColumna == -1) {
+            cout << "No se encontró la columna" << std::endl;
+            return;
+        }
+
+        while (getline(archivo, linea)) {
+            istringstream ss(linea);
+            string valor;
+            for (int i = 0; i <= indiceColumna; i++) {
+                getline(ss, valor, ',');
+            }
+            //cout << valor << endl;
+            add(valor);
+        }
+
+        archivo.close();
+
+    }
 };
 
-#endif // !HYPERLOGLOG
+#endif // HYPERLOGLOG

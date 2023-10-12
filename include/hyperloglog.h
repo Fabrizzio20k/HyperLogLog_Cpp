@@ -55,8 +55,11 @@ private:
     }
 
 public:
-    explicit HyperLogLog(int _p) // Los valores de p van desde 4 hasta 16 segun el paper
+    explicit HyperLogLog(int _p = 4) // Los valores de p van desde 4 hasta 16 segun el paper
     {
+        if (_p < 4 || _p > 16){
+            throw invalid_argument("El valor de p debe estar entre 4 y 16");
+        }
         this->p = _p;                // Valor de precision
         this->m = 1 << p;            // 2^p buckets, movemos 1 p veces a la izquierda para obtener el valor de 2^p
         this->M = vector<int>(m, 0); // Inicializamos el vector de buckets con 0
@@ -96,7 +99,7 @@ public:
         return E * 2;
     }
 
-    void add(const string &data) // Agrega un elemento al vector de buckets
+    void insert(const string &data) // Agrega un elemento al vector de buckets
     {
         uint32_t hash;
         MurmurHash3_x86_32(data.c_str(), data.size(), 313, &hash);
@@ -106,8 +109,26 @@ public:
         int rho = get_rho(w);
         M[idx] = max(M[idx], rho);
     }
+
+    template<class T>
+    void insert(const T& data) // Agrega un elemento al vector de buckets
+    {
+        string dataString = to_string(data);
+        uint32_t hash;
+        MurmurHash3_x86_32(dataString.c_str(), dataString.size(), 313, &hash);
+
+        uint32_t idx = hash >> (32 - p);           // Tomamos los p bits mas significativos del hash
+        uint32_t w = hash & ((1 << (32 - p)) - 1); // Tomamos los 32 - p bits menos significativos del hash
+        int rho = get_rho(w);
+        M[idx] = max(M[idx], rho);
+    }
     void merge(const HyperLogLog &hll) // Mergea dos HyperLogLog
     {
+        if (hll.p != p)
+        {
+            throw invalid_argument("Los valores de p deben ser iguales");
+        }
+
         for (int i = 0; i < m; i++)
         {
             M[i] = max(M[i], hll.M[i]);
@@ -162,7 +183,7 @@ public:
                 getline(ss, valor, ',');
             }
             //cout << valor << endl;
-            add(valor);
+            insert(valor);
         }
 
         archivo.close();

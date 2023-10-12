@@ -2,9 +2,11 @@
 
 int main()
 {
-    HyperLogLog hll(16);
-    hll.count_from_csv("../mock/MOCK_DATA.csv", "email");
-    cout << hll.count() << endl;
+    HyperLogLog hll(4);
 
-    return 0;
+    for (int i = 0; i < 1000000; ++i) {
+        hll.insert(to_string(i));
+    }
+
+    cout << "Estimación de elementos: " << hll.count() << endl;
 }

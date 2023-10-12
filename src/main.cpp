@@ -1,8 +1,13 @@
 #include "hyperloglog.h"
 
-int main()
-{
-    HyperLogLog hll(15);
-    hll.count_from_csv("../mock/esas_mehsullar.csv", "satish_kodu");
+using namespace std;
+
+int main(){
+    HyperLogLog hll(16);
+    for (int i = 0; i < 100000000; ++i) {
+        hll.insert(to_string(i));
+    }
+
     cout << hll.count() << endl;
 }
+

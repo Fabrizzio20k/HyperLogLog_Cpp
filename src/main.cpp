@@ -8,5 +8,5 @@ int main()
         hll.insert(to_string(i));
     }
 
-    cout << "Estimación de elementos: " << hll.count() << endl;
+    cout << "Estimacion de elementos: " << hll.count() << endl;
 }

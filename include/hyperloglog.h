@@ -7,7 +7,8 @@
 #include <bitset>
 #include <fstream>
 #include <sstream>
-#include "MurmurHash3.h"
+#include <type_traits>
+#include "MurmurHash3/MurmurHash3.h"
 
 using namespace std;
 
@@ -110,18 +111,6 @@ public:
         M[idx] = max(M[idx], rho);
     }
 
-    template<class T>
-    void insert(const T& data) // Agrega un elemento al vector de buckets
-    {
-        string dataString = to_string(data);
-        uint32_t hash;
-        MurmurHash3_x86_32(dataString.c_str(), dataString.size(), 313, &hash);
-
-        uint32_t idx = hash >> (32 - p);           // Tomamos los p bits mas significativos del hash
-        uint32_t w = hash & ((1 << (32 - p)) - 1); // Tomamos los 32 - p bits menos significativos del hash
-        int rho = get_rho(w);
-        M[idx] = max(M[idx], rho);
-    }
     void merge(const HyperLogLog &hll) // Mergea dos HyperLogLog
     {
         if (hll.p != p)
@@ -177,10 +166,10 @@ public:
         }
 
         while (getline(archivo, linea)) {
-            istringstream ss(linea);
+            istringstream ss_2(linea);
             string valor;
             for (int i = 0; i <= indiceColumna; i++) {
-                getline(ss, valor, ',');
+                getline(ss_2, valor, ',');
             }
             //cout << valor << endl;
             insert(valor);

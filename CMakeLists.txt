@@ -8,6 +8,6 @@ include_directories(lib)
 
 add_executable(HyperLogLog_Cpp
         include/hyperloglog.h
-        lib/MurmurHash3.cpp
-        lib/MurmurHash3.h
+        lib/MurmurHash3/MurmurHash3.cpp
+        lib/MurmurHash3/MurmurHash3.h
         src/main.cpp)

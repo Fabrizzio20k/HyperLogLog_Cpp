@@ -1,7 +1,7 @@
 #include "api.h"
 
-int main() {
+int main()
+{
     Api api;
     api.run();
-    return 0;
 }

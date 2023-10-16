@@ -9,6 +9,7 @@
 #include <sstream>
 #include <type_traits>
 #include "MurmurHash3/MurmurHash3.h"
+#include <map>
 
 using namespace std;
 
@@ -68,10 +69,6 @@ public:
         alpha = (m == 16) ? 0.673 : (m == 32) ? 0.697
                                               : (m == 64)   ? 0.709
                                                             : 0.7213 / (1 + 1.079 / m); // Valor de correccion de acuerdo al paper
-
-        cout << "p: " << p << endl;
-        cout << "m: " << m << endl;
-        cout << "alpha: " << alpha << endl;
     }
 
     double count() // Calcula la estimacion de acuerdo al paper
@@ -177,6 +174,14 @@ public:
 
         archivo.close();
 
+    }
+
+    [[nodiscard]] map<string,string> get_info_structure() const{
+        map<string,string> info;
+        info["p"] = to_string(p);
+        info["m"] = to_string(m);
+        info["alpha"] = to_string(alpha);
+        return info;
     }
 };
 

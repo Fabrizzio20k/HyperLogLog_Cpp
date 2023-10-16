@@ -111,7 +111,7 @@ public:
 
         map <string, double> result;
 
-        result["cardinality"] = E * 2;
+        result["count"] = E * 2;
         result["time"] = elapsed_milliseconds;
 
         return result;

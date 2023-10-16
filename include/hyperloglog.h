@@ -10,6 +10,7 @@
 #include <type_traits>
 #include "MurmurHash3/MurmurHash3.h"
 #include <map>
+#include <chrono>
 
 using namespace std;
 
@@ -20,6 +21,8 @@ private:
     int m;         // 2^p buckets a crear de acuerdo al paper - cantidad total de buckets
     vector<int> M; // Vector de buckets
     double alpha;  // Valor de correccion de acuerdo al paper
+
+    long long total_inserted_elements;
 
     static int get_rho(bitset<32> hash_bin) // Nos da la cantidad de ceros consecutivos antes del primer 1
     {
@@ -65,14 +68,20 @@ public:
         this->p = _p;                // Valor de precision
         this->m = 1 << p;            // 2^p buckets, movemos 1 p veces a la izquierda para obtener el valor de 2^p
         this->M = vector<int>(m, 0); // Inicializamos el vector de buckets con 0
+        this->total_inserted_elements = 0; // Inicializamos la cantidad de elementos insertados, no es necesario incluir esto
 
         alpha = (m == 16) ? 0.673 : (m == 32) ? 0.697
                                               : (m == 64)   ? 0.709
                                                             : 0.7213 / (1 + 1.079 / m); // Valor de correccion de acuerdo al paper
     }
 
-    double count() // Calcula la estimacion de acuerdo al paper
+    map<string, double> count() // Calcula la estimacion de acuerdo al paper
     {
+        chrono::high_resolution_clock::time_point start_time;
+        chrono::high_resolution_clock::time_point end_time;
+
+        start_time = std::chrono::high_resolution_clock::now();
+
         double Z = 0;
         for (int i = 0; i < m; i++)
         {
@@ -94,7 +103,18 @@ public:
             E = -pow(2, 32) * log(1 - E / pow(2, 32));
         }
 
-        return E * 2;
+        end_time = std::chrono::high_resolution_clock::now();
+
+        chrono::duration<double, milli> duration = end_time - start_time;
+
+        double elapsed_milliseconds = duration.count();
+
+        map <string, double> result;
+
+        result["cardinality"] = E * 2;
+        result["time"] = elapsed_milliseconds;
+
+        return result;
     }
 
     void insert(const string &data) // Agrega un elemento al vector de buckets
@@ -106,6 +126,8 @@ public:
         uint32_t w = hash & ((1 << (32 - p)) - 1); // Tomamos los 32 - p bits menos significativos del hash
         int rho = get_rho(w);
         M[idx] = max(M[idx], rho);
+
+        total_inserted_elements++;
     }
 
     void merge(const HyperLogLog &hll) // Mergea dos HyperLogLog
@@ -119,6 +141,8 @@ public:
         {
             M[i] = max(M[i], hll.M[i]);
         }
+
+        total_inserted_elements += hll.total_inserted_elements;
     }
 
     void clear() // Limpia el vector de buckets
@@ -127,6 +151,8 @@ public:
         {
             M[i] = 0;
         }
+
+        total_inserted_elements = 0;
     }
 
     void count_from_csv(const string& nombreArchivo, const string& nombreColumna){
@@ -168,7 +194,6 @@ public:
             for (int i = 0; i <= indiceColumna; i++) {
                 getline(ss_2, valor, ',');
             }
-            //cout << valor << endl;
             insert(valor);
         }
 
@@ -181,6 +206,7 @@ public:
         info["p"] = to_string(p);
         info["m"] = to_string(m);
         info["alpha"] = to_string(alpha);
+        info["total_inserted_elements"] = to_string(total_inserted_elements);
         return info;
     }
 };

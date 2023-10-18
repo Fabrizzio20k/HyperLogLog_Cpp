@@ -186,7 +186,7 @@ Api::Api() {
 
         double res = (double) ( v["count"] / w) * 100;
 
-        response["hll"]["precision"] = res <= 100 ? res : 100 - res;
+        response["hll"]["precision"] = res <= 100 ? res : abs(200 - res);
 
         auto x = hll->get_info_structure();
 
@@ -243,7 +243,7 @@ Api::Api() {
 
         double res = (double) ( v["count"] / w) * 100;
 
-        response["hll"]["precision"] = res <= 100 ? res : 100 - res;
+        response["hll"]["precision"] = res <= 100 ? res : abs(200 - res);
 
         auto x = hll->get_info_structure();
 

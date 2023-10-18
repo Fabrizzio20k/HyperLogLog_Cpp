@@ -44,7 +44,7 @@ public:
 
         start_time = std::chrono::high_resolution_clock::now();
 
-        clear();
+        values.clear();
 
         ifstream archivo(nombreArchivo);
         if (!archivo.is_open()) {
@@ -102,7 +102,7 @@ public:
 
         start_time = std::chrono::high_resolution_clock::now();
 
-        clear();
+        set_values.clear();
 
         ifstream archivo(nombreArchivo);
         if (!archivo.is_open()) {
@@ -167,8 +167,13 @@ public:
     map<string, double> get_info_memory(){
         map<string, double> info;
         info["memory_vector_kb"] = (double) (sizeof(values[0]) * values.size() + sizeof(values))/1000;
-        info["memory_set_kb"] = (double) (sizeof(set_values) + sizeof(set_values.begin()) * set_values.size())/1000;
+        info["memory_set_kb"] = (double) (sizeof(set_values.begin()) * set_values.size() + sizeof(set_values))/1000;
         return info;
+    }
+
+    ~comparative(){
+        values.clear();
+        set_values.clear();
     }
 
 };

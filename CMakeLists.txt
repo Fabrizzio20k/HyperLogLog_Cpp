@@ -12,4 +12,6 @@ add_executable(HyperLogLog_Cpp
         lib/MurmurHash3/MurmurHash3.cpp
         lib/MurmurHash3/MurmurHash3.h
         src/main.cpp
-        lib/Crow/crow.h)
+        lib/Crow/crow.h
+        include/comparative.h
+        include/api.h)

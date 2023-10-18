@@ -3,12 +3,14 @@
 
 #include "Crow/crow.h"
 #include "hyperloglog.h"
+#include "comparative.h"
 
 class Api {
     public:
         Api();
         void run();
         HyperLogLog* hll = nullptr;
+        comparative* comp = nullptr;
     private:
         crow::SimpleApp app;
 };
@@ -29,16 +31,30 @@ Api::Api() {
             delete hll;
 
         hll = new HyperLogLog(p);
+        comp = new comparative();
 
         crow::json::wvalue response;
 
         response["status"] = "ok";
         response["message"] = "HyperLogLog created";
+        response["message_2"] = "Comparative structures created";
 
         auto x = hll->get_info_structure();
 
         for(const auto& i:x){
-            response["info"][i.first] = i.second;
+            response["info_hll"][i.first] = i.second;
+        }
+
+        auto y = comp->get_info_size();
+
+        for(const auto& i:y){
+            response["info_comp"][i.first] = i.second;
+        }
+
+        auto z = comp->get_info_memory();
+
+        for(const auto& i:z){
+            response["info_comp"][i.first] = i.second;
         }
 
         return crow::response(response);
@@ -56,16 +72,30 @@ Api::Api() {
         string value = json["value"].s();
 
         hll->insert(value);
+        comp->insert(value);
 
         crow::json::wvalue response;
 
         response["status"] = "ok";
-        response["message"] = "Value inserted";
+        response["message"] = "Value inserted in hyperloglog";
+        response["message_2"] = "Value inserted in comparative structures";
 
         auto x = hll->get_info_structure();
 
         for(const auto& i:x){
-            response["info"][i.first] = i.second;
+            response["info_hll"][i.first] = i.second;
+        }
+
+        auto y = comp->get_info_size();
+
+        for(const auto& i:y){
+            response["info_comp"][i.first] = i.second;
+        }
+
+        auto z = comp->get_info_memory();
+
+        for(const auto& i:z){
+            response["info_comp"][i.first] = i.second;
         }
 
         return crow::response(response);
@@ -79,12 +109,24 @@ Api::Api() {
         crow::json::wvalue response;
 
         response["status"] = "ok";
-        response["message"] = "Info";
+        response["message"] = "Info hyperloglog and comparative structures";
 
         auto x = hll->get_info_structure();
 
         for(const auto& i:x){
-            response["info"][i.first] = i.second;
+            response["info_hll"][i.first] = i.second;
+        }
+
+        auto y = comp->get_info_size();
+
+        for(const auto& i:y){
+            response["info_comp"][i.first] = i.second;
+        }
+
+        auto z = comp->get_info_memory();
+
+        for(const auto& i:z){
+            response["info_comp"][i.first] = i.second;
         }
 
         return crow::response(response);
@@ -96,16 +138,30 @@ Api::Api() {
             return crow::response(400);
 
         hll->clear();
+        comp->clear();
 
         crow::json::wvalue response;
 
         response["status"] = "ok";
         response["message"] = "HyperLogLog reseted";
+        response["message_2"] = "Comparative structures reseted";
 
         auto x = hll->get_info_structure();
 
         for(const auto& i:x){
-            response["info"][i.first] = i.second;
+            response["info_hll"][i.first] = i.second;
+        }
+
+        auto y = comp->get_info_size();
+
+        for(const auto& i:y){
+            response["info_comp"][i.first] = i.second;
+        }
+
+        auto z = comp->get_info_memory();
+
+        for(const auto& i:z){
+            response["info_comp"][i.first] = i.second;
         }
 
         return crow::response(response);
@@ -119,17 +175,35 @@ Api::Api() {
         crow::json::wvalue response;
 
         response["status"] = "ok";
-        response["message"] = "Count";
+        response["message"] = "Count from hyperloglog and comparative structures";
 
-        auto x = hll->count();
+        auto v = hll->count();
 
-        response["count"] = x["count"];
-        response["time"] = x["time"];
+        response["hll"]["count_hll"] = v["count"];
+        response["hll"]["time_hll"] = v["time"];
 
-        auto y = hll->get_info_structure();
+        size_t w = comp->get_count();
+
+        double res = (double) ( v["count"] / w) * 100;
+
+        response["hll"]["precision"] = res <= 100 ? res : 100 - res;
+
+        auto x = hll->get_info_structure();
+
+        for(const auto& i:x){
+            response["hll"]["info_hll"][i.first] = i.second;
+        }
+
+        auto y = comp->get_info_size();
 
         for(const auto& i:y){
-            response["info"][i.first] = i.second;
+            response["comparative"]["info_comp"][i.first] = i.second;
+        }
+
+        auto z = comp->get_info_memory();
+
+        for(const auto& i:z){
+            response["comparative"]["info_comp"][i.first] = i.second;
         }
 
         return crow::response(response);
@@ -149,20 +223,44 @@ Api::Api() {
 
         hll->count_from_csv(nombreArchivo, nombreColumna);
 
+        double time_vector = comp->count_from_csv_vector(nombreArchivo, nombreColumna);
+        double time_set = comp->count_from_csv_set(nombreArchivo, nombreColumna);
+
         crow::json::wvalue response;
 
         response["status"] = "ok";
         response["message"] = "Count from csv";
 
-        auto x = hll->count();
+        response["comparative"]["time_vector"] = time_vector;
+        response["comparative"]["time_set"] = time_set;
 
-        response["count"] = x["count"];
-        response["time"] = x["time"];
+        auto v = hll->count();
 
-        auto y = hll->get_info_structure();
+        response["hll"]["count_hll"] = v["count"];
+        response["hll"]["time_hll"] = v["time"];
+
+        size_t w = comp->get_count();
+
+        double res = (double) ( v["count"] / w) * 100;
+
+        response["hll"]["precision"] = res <= 100 ? res : 100 - res;
+
+        auto x = hll->get_info_structure();
+
+        for(const auto& i:x){
+            response["hll"]["info_hll"][i.first] = i.second;
+        }
+
+        auto y = comp->get_info_size();
 
         for(const auto& i:y){
-            response["info"][i.first] = i.second;
+            response["comparative"]["info_comp"][i.first] = i.second;
+        }
+
+        auto z = comp->get_info_memory();
+
+        for(const auto& i:z){
+            response["comparative"]["info_comp"][i.first] = i.second;
         }
 
         return crow::response(response);

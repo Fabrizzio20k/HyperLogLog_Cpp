@@ -209,7 +209,7 @@ Api::Api() {
         return crow::response(response);
     });
 
-    CROW_ROUTE(app,"/api/v1/hyperloglog/csv").methods("POST"_method)
+    CROW_ROUTE(app,"/api/v1/hyperloglog/csv_comparation").methods("POST"_method)
     ([this](const crow::request& req) {
         auto json = crow::json::load(req.body);
         if (!json)
@@ -266,6 +266,38 @@ Api::Api() {
         return crow::response(response);
     });
 
+    CROW_ROUTE(app, "/api/v1/hyperloglog/csv_hll").methods("POST"_method)
+    ([this](const crow::request& req) {
+        auto json = crow::json::load(req.body);
+        if (!json)
+            return crow::response(400);
+
+        if (hll == nullptr)
+            return crow::response(400);
+
+        string nombreArchivo = json["nombreArchivo"].s();
+        string nombreColumna = json["nombreColumna"].s();
+
+        hll->count_from_csv(nombreArchivo, nombreColumna);
+
+        crow::json::wvalue response;
+
+        response["status"] = "ok";
+        response["message"] = "Count from csv";
+
+        auto v = hll->count();
+
+        response["hll"]["count_hll"] = v["count"];
+        response["hll"]["time_hll"] = v["time"];
+
+        auto x = hll->get_info_structure();
+
+        for(const auto& i:x){
+            response["hll"]["info_hll"][i.first] = i.second;
+        }
+
+        return crow::response(response);
+    });
 
 }
 

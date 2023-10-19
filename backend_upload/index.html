@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h2>Subir archivo CSV</h2>
+
+    <form
+      action="http://localhost:5001/upload"
+      method="post"
+      enctype="multipart/form-data"
+    >
+      Selecciona el archivo CSV:
+      <input type="file" id="file" name="file" /><br /><br />
+      <input type="submit" value="Subir archivo" />
+    </form>
+  </body>
+</html>

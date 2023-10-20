@@ -24,6 +24,7 @@
   .left h1{
     padding: 0 15px;
     color: white;
+    transition: 0.5s;
   }
 
   .left h1:hover{

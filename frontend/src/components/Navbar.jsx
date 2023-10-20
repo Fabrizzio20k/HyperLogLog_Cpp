@@ -32,7 +32,7 @@ export default function Navbar() {
                 </div>
             </Link>
         </div>
-        <div className="right">
+        <div className={`right ${pathName === '/' ? 'disable_content' : 'active_content'}`}>
             <Link href='/' style={{ textDecoration: 'none', color:'white'}}>
                 <h3> ⬅️ Return to Main Page</h3>
             </Link>

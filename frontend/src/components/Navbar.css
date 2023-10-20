@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+
+.navbar {
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    color: white;
+  
+    /* Aplicar un degradado solo al borde inferior */
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(to right, transparent, white, transparent) 100%;
+    border-image-slice: 1;
+  }
+  
+  
+  .left{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    border: 5px black solid;
+  }
+  .left h1{
+    padding: 0 15px;
+    color: white;
+  }
+
+  .left h1:hover{
+    color: #00d7f3;
+    transition: 0.5s;
+  }
+  
+  .center{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    border: 5px black solid;
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .information{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-right: 30px;
+    transition: 0.5s;
+  }
+
+  .active{
+    color: #00ff95;
+  }
+
+  .information:hover{
+    color: #00ff95;
+    transition: 0.5s;
+  }
+
+  .information,
+.playground {
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.information,
+.playground {
+  position: relative;
+  cursor: pointer;
+}
+
+.information::before,
+.playground::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 3px; /* Grosor del borde inferior */
+  background-color: #00ff95; /* Color del borde inferior */
+  transition: width 0.3s ease-in-out; /* Duración de la animación y función de aceleración */
+}
+
+.information:hover::before,
+.playground:hover::before {
+  width: 100%;
+}
+
+  .playground{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.5s;
+  }
+
+  .playground:hover{
+    color: #00ff95;
+    transition: 0.5s;
+  }
+
+  .right{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    margin: 0;
+    transition: 0.5s;
+  }
+
+  .right h3{
+    color: white;
+    transition: 0.5s;
+  }
+
+  .right h3:hover{
+    color: #00d7f3;
+    transition: 0.5s;
+  }

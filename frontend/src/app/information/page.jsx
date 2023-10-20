@@ -1,7 +1,7 @@
 export default function Page() {
     return (
         <div>
-            <h1>HyperLogLog C++</h1>
+            <h1>Hello world</h1>
         </div>
     );
 }

@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+.footerContainer {
+    font-family: 'Poppins', sans-serif;
+    background-color: rgb(0, 0, 0);
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    font-size: 14px;
+    background-image: linear-gradient(to right, transparent, white, transparent);
+    background-size: 100% 3px; /* Altura del degradado y ancho del 100% */
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footerContainer h3{
+    margin-left: 10px;
+    margin-right: 10px;
+}

@@ -3,6 +3,13 @@ body {
   padding: 0;
   background-color: #000000;
 }
+.content{
+  margin: 0;
+  padding: 0;
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+}
 
 
 

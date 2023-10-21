@@ -34,3 +34,21 @@ export const infoHLL = async () => {
         console.log(error);
     }
 }
+
+export const resetHLL = async () => {
+    try {
+        const { data } = await axios.post(linkAPI + "reset");
+        return data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const countHLL = async () => {
+    try {
+        const { data } = await axios.get(linkAPI + "count");
+        return data;
+    } catch (error) {
+        console.log(error);
+    }
+}

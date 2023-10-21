@@ -6,7 +6,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearSca
 import { Doughnut, Line } from 'react-chartjs-2';
 import { useState } from 'react';
 import Image from 'next/image';
-import { createHLL, insertHLL, infoHLL } from './functions';
+import { createHLL, insertHLL, infoHLL, resetHLL, countHLL } from './functions';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title);
 
@@ -24,45 +24,13 @@ const options = {
 
 const labels = ['HyperLogLog', 'Vector', 'Set'];
 
-const dataMemory = {
-  labels,
-  datasets: [
-    {
-      label: 'Memory(kb)',
-      data: [697.5, 6543.32, 2435.32],
-      backgroundColor: [
-        'rgba(0, 195, 255, 0.2)',
-        'rgba(0, 255, 21, 0.2)',
-        'rgba(255, 0, 234, 0.2)',
-      ],
-      borderColor: [
-        'rgba(0, 183, 255, 1)',
-        'rgba(0, 255, 21, 1)',
-        'rgba(255, 0, 234, 1)',
-      ],
-      borderWidth: 2,
-    },
-  ],
-};
-
-const dataTime = {
-  labels,
-  datasets: [
-    {
-      label: 'Execution time (ms)',
-      data: [434.52,360000.32,1423.42],
-      borderColor: 'rgb(255, 99, 132)',
-      backgroundColor: 'rgba(255, 99, 132, 0.5)',
-    },
-  ],
-};
-
-
 
 export default function Page() {
 
+    //values to send to backend
     const [operationType, setOperation] = useState('new_hll');
     const [selectedP, setSelectedP] = useState(4);
+    const [value, setValue] = useState("");
 
     // States
     const [P, setP] = useState(4);
@@ -70,11 +38,15 @@ export default function Page() {
     const [Alpha, setAlpha] = useState(0.0);
     const [MemoryHLL, setMemoryHLL] = useState(0.0);
     const [InsertedElements, setInsertedElements] = useState(0);
+    const [Precision, setPrecision] = useState(0.0);
+    const [TimeHLL, setTimeHLL] = useState(0.0);
+    const [CountHLL, setCountHLL] = useState(0.0);
+    const [CountVector, setCountVector] = useState(0.0);
+    const [CountSet, setCountSet] = useState(0.0);
+    const [MemoryVector, setMemoryVector] = useState(0.0);
+    const [MemorySet, setMemorySet] = useState(0.0);
 
-    //value
-    const [value, setValue] = useState("");
-
-
+    //main data
     const mainHLLData={
       hll:{
         p: P,
@@ -82,11 +54,52 @@ export default function Page() {
         alpha: Alpha,
         memory: MemoryHLL,
         insertedElements: InsertedElements,
+        count_hll: CountHLL,
+        time_hll: TimeHLL,
+        precision: Precision,
       },
       comparative:{
-        memory_set: 697.5,
+        memory_set: MemorySet,
+        memory_vector: MemoryVector,
+        count_set: CountSet,
+        count_vector: CountVector,
       },
     }
+
+    //data for graphics
+    const dataMemory = {
+      labels,
+      datasets: [
+        {
+          label: 'Memory (kb)',
+          data: [mainHLLData.hll.memory, mainHLLData.comparative.memory_vector, mainHLLData.comparative.memory_set],
+          backgroundColor: [
+            'rgba(0, 195, 255, 0.2)',
+            'rgba(0, 255, 21, 0.2)',
+            'rgba(255, 0, 234, 0.2)',
+          ],
+          borderColor: [
+            'rgba(0, 183, 255, 1)',
+            'rgba(0, 255, 21, 1)',
+            'rgba(255, 0, 234, 1)',
+          ],
+          borderWidth: 2,
+        },
+      ],
+    };
+    
+    const dataTime = {
+      labels,
+      datasets: [
+        {
+          label: 'Execution time (ms)',
+          data: [434.52,360000.32,1423.42],
+          borderColor: 'rgb(255, 99, 132)',
+          backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        },
+      ],
+    };
+
 
     function operationHLL(type) {
       return async () => {
@@ -99,15 +112,36 @@ export default function Page() {
           data = await insertHLL(value);
         } else if (type === "info") {
           data = await infoHLL();
+        } else if (type === "count"){
+          data = await countHLL();
         }
 
-        setP(data.info_hll.p);
-        setM(data.info_hll.m);
-        setAlpha(data.info_hll.alpha);
-        setMemoryHLL(data.info_hll.memory_kb);
-        setInsertedElements(data.info_hll.total_inserted_elements);
+        if (type !== "count") {
+          setP(data.info_hll.p);
+          setM(data.info_hll.m);
+          setAlpha(data.info_hll.alpha);
+          setMemoryHLL(data.info_hll.memory_kb);
+          setInsertedElements(data.info_hll.total_inserted_elements);
+        }
+        
+        else{
+          setP(data.hll.info_hll.p);
+          setM(data.hll.info_hll.m);
+          setAlpha(data.hll.info_hll.alpha);
+          setMemoryHLL(data.hll.info_hll.memory_kb);
+          setInsertedElements(data.hll.info_hll.total_inserted_elements);
+          setCountHLL(data.hll.count_hll);
+          setTimeHLL(data.hll.time_hll);
+          setPrecision(data.hll.precision.toFixed(2));
+          setCountVector(data.comparative.info_comp.values_vector);
+          setCountSet(data.comparative.info_comp.values_set);
+          setMemoryVector(data.comparative.info_comp.memory_vector_kb);
+          setMemorySet(data.comparative.info_comp.memory_set_kb);
+        }
+
         setOperation(type);
-      }
+
+      } 
     }
 
     return (
@@ -147,6 +181,15 @@ export default function Page() {
                   <button type="button" onClick={operationHLL('info')}>Get it</button>
               </div>
 
+              <h1>Count the elements of your HLL here ✨</h1>
+              <div className='create-controls purple'>
+                  <button type="button" onClick={operationHLL('count')}>Count now</button>
+              </div>
+
+              <h1>Reset your HLL here 🫧</h1>
+              <div className='create-controls red'>
+                  <button type="button" onClick={operationHLL('reset')}>Reset now</button>
+              </div>
 
             </div>
 
@@ -217,8 +260,6 @@ export default function Page() {
                   <br/>
                   <div className='create-content'>
                     <h1>HLL information:</h1>
-
-                    <div className='features'>
                       <div className='features'>
                         <h2>➡️ P (accuracy value) : {mainHLLData.hll.p}</h2>
                         <h2>➡️ M (number of buckets) : {mainHLLData.hll.m}</h2>
@@ -226,7 +267,6 @@ export default function Page() {
                         <h2>➡️ Memory : {mainHLLData.hll.memory} Kb</h2>
                         <h2>➡️ Inserted elements: {mainHLLData.hll.insertedElements}</h2>
                       </div>
-                    </div>
                       <br/><br/>
                       <Image 
                         src='/information.png'
@@ -237,18 +277,18 @@ export default function Page() {
                   </div>
               </div>
 
-              <div className='reset nonactive'>
+              <div className={`reset ${(operationType === "reset") ? "":"nonactive"}`}>
                 <h1>HyperLogLog was restored successfully !!!</h1>
                   <br/>
                   <div className='create-content'>
                     <h1>HLL information:</h1>
 
                     <div className='features'>
-                      <h2>➡️ P (accuracy value) : 4</h2>
-                      <h2>➡️ M (number of buckets) : 32</h2>
-                      <h2>➡️ Alpha (bias correction factor) : 0.673</h2>
-                      <h2>➡️ Memory : 233.18 Kb</h2>
-                      <h2>➡️ Inserted elements: 0</h2>
+                      <h2>➡️ P (accuracy value) : {mainHLLData.hll.p}</h2>
+                      <h2>➡️ M (number of buckets) : {mainHLLData.hll.m}</h2>
+                      <h2>➡️ Alpha (bias correction factor) : {mainHLLData.hll.alpha}</h2>
+                      <h2>➡️ Memory : {mainHLLData.hll.memory} Kb</h2>
+                      <h2>➡️ Inserted elements: {mainHLLData.hll.insertedElements}</h2>
                     </div>
                       <br/><br/>
                       <Image 
@@ -260,11 +300,12 @@ export default function Page() {
                   </div>
               </div>
 
-              <div className='count nonactive'>
-                  <h3>Total count of elements: 1</h3>
+              <div className={`count ${(operationType === "count") ? "":"nonactive"}`}>
+                  <h3>Total elements inserted: {mainHLLData.hll.insertedElements}</h3>
+                  <h3>Total different elements inserted: {mainHLLData.comparative.count_set}</h3>
                   <h1>⬇️ Total count of HyperLogLog ⬇️</h1>
-                  <h1>👉🏻 99872.423 elements</h1>
-                  <Circlegraph percentage={0.45} color={"skyblue"} message = {`${0.45}% accuracy compared to <vector> and <set> structures`}/>
+                  <h1>👉🏻 {mainHLLData.hll.count_hll} elements</h1>
+                  <Circlegraph percentage={mainHLLData.hll.precision} color={"skyblue"} message = {`${mainHLLData.hll.precision}% accuracy compared to <vector> and <set> structures`}/>
                   <br/><br/>
                   <h1>👾 Memory used (kb) 👾</h1>
                   <div className='graph-1'>
@@ -272,7 +313,7 @@ export default function Page() {
                   </div>
                   <br/><br/>
                   <h1>⏱️ Execution time (HLL)⏱️</h1>
-                  <h1>👉🏻 0.52 ms</h1>
+                  <h1>👉🏻 {mainHLLData.hll.time_hll} ms</h1>
               </div>
 
               <div className='count-hll nonactive'>

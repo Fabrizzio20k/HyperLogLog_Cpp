@@ -111,6 +111,26 @@
     color: #2d3000;
 }
 
+.create-controls.red button{
+    background-color: #300000;
+    border: 2px solid #ff0000;
+}
+
+.create-controls.red button:hover{
+    background-color: #b60000;
+    color: #300000;
+}
+
+.create-controls.purple button{
+    background-color: #300030;
+    border: 2px solid #ff00ff;
+}
+
+.create-controls.purple button:hover{
+    background-color: #b600b6;
+    color: #300030;
+}
+
 
 .graphic-panel{
     width: 40%;

@@ -166,8 +166,8 @@ public:
 
     map<string, double> get_info_memory(){
         map<string, double> info;
-        info["memory_vector_kb"] = (double) (sizeof(values[0]) * values.size() + sizeof(values))/1000;
-        info["memory_set_kb"] = (double) (sizeof(set_values.begin()) * set_values.size() + sizeof(set_values))/1000;
+        info["memory_vector_kb"] = (double) (sizeof(string) * values.size() + sizeof(values))/1000;
+        info["memory_set_kb"] = (double) (sizeof(string) * set_values.size() + sizeof(set_values))/1000;
         return info;
     }
 

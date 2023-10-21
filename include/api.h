@@ -30,6 +30,9 @@ Api::Api() {
         if (hll != nullptr)
             delete hll;
 
+        if (comp != nullptr)
+            delete comp;
+
         hll = new HyperLogLog(p);
         comp = new comparative();
 
@@ -44,6 +47,8 @@ Api::Api() {
         for(const auto& i:x){
             response["info_hll"][i.first] = i.second;
         }
+
+        response["info_hll"]["memory_kb"] = hll->get_memory();
 
         auto y = comp->get_info_size();
 
@@ -86,6 +91,8 @@ Api::Api() {
             response["info_hll"][i.first] = i.second;
         }
 
+        response["info_hll"]["memory_kb"] = hll->get_memory();
+
         auto y = comp->get_info_size();
 
         for(const auto& i:y){
@@ -116,6 +123,8 @@ Api::Api() {
         for(const auto& i:x){
             response["info_hll"][i.first] = i.second;
         }
+
+        response["info_hll"]["memory_kb"] = hll->get_memory();
 
         auto y = comp->get_info_size();
 
@@ -151,6 +160,8 @@ Api::Api() {
         for(const auto& i:x){
             response["info_hll"][i.first] = i.second;
         }
+
+        response["info_hll"]["memory_kb"] = hll->get_memory();
 
         auto y = comp->get_info_size();
 
@@ -193,6 +204,8 @@ Api::Api() {
         for(const auto& i:x){
             response["hll"]["info_hll"][i.first] = i.second;
         }
+
+        response["hll"]["info_hll"]["memory_kb"] = hll->get_memory();
 
         auto y = comp->get_info_size();
 
@@ -251,6 +264,8 @@ Api::Api() {
             response["hll"]["info_hll"][i.first] = i.second;
         }
 
+        response["hll"]["info_hll"]["memory_kb"] = hll->get_memory();
+
         auto y = comp->get_info_size();
 
         for(const auto& i:y){
@@ -295,6 +310,8 @@ Api::Api() {
         for(const auto& i:x){
             response["hll"]["info_hll"][i.first] = i.second;
         }
+
+        response["hll"]["info_hll"]["memory_kb"] = hll->get_memory();
 
         return crow::response(response);
     });

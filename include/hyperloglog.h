@@ -207,9 +207,11 @@ public:
         info["m"] = to_string(m);
         info["alpha"] = to_string(alpha);
         info["total_inserted_elements"] = to_string(total_inserted_elements);
-        info["memory_kb"] = to_string((double)(sizeof(M[0]) * M.size() + sizeof(M))/1000);
-
         return info;
+    }
+
+    double get_memory(){
+        return  (double)(sizeof(M[0]) * M.size() + sizeof(M))/1000;
     }
 };
 

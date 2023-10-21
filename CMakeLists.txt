@@ -14,4 +14,5 @@ add_executable(HyperLogLog_Cpp
         src/main.cpp
         lib/Crow/crow.h
         include/comparative.h
-        include/api.h)
+        include/api.h
+        lib/Crow/crow/middlewares/cors.h)

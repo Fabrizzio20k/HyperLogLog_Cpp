@@ -1,9 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
-
 .nonactive{
   display: none !important;
 }
+
+
 
 .playground-page{
     font-family: 'Poppins', sans-serif;
@@ -21,6 +22,59 @@
     border-right: 3px solid transparent;
     border-image: linear-gradient(to top, transparent, white, transparent) 100%;
     border-image-slice: 1;
+}
+
+.control-panel h1{
+    text-align: left;
+    font-weight: bold;
+    font-size: 40px;
+}
+
+.new-hll {
+    display: flex;
+    flex-direction: row; /* Cambia la dirección a columna en pantallas pequeñas */
+    align-items: center;
+    justify-content: left;
+}
+
+.new-hll select{
+    font-family: 'Poppins', sans-serif;
+    width: 30%;
+    height: 40px;
+    padding: 5px;
+    font-size: 16px;
+    margin-left: 40px;
+    background-color: #041f12;
+    border-radius: 5px;
+    border: 2px solid #ccc;
+    font-weight: bold;
+    color: white;
+}
+  
+  .create-controls {
+    display: flex;
+    flex-direction: row; /* Cambia la dirección a columna en pantallas pequeñas */
+    align-items: center; /* Alinea los elementos al centro en pantallas pequeñas */
+    justify-content: left;
+  }
+
+.create-controls button{
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #003021;
+    color: white;
+    width: 25%;
+    height: 50px;
+    border-radius: 5px;
+    border: 2px solid #00ffaa;
+    font-size: 16px;
+    transition: 0.5s;
+}
+
+.create-controls button:hover{
+    background-color: #00b679;
+    color: #003021;
 }
 
 .graphic-panel{
@@ -135,6 +189,23 @@
     .control-panel{
         width: 100%;
     }
+
+    .new-hll{
+        flex-direction: column; 
+    }
+    .new-hll select{
+        margin-left: 0;
+    }
+    .create-controls{
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .create-controls button{
+        max-width: 40%;
+    }
+
     .graphic-panel{
         width: 100%;
     }

@@ -4,7 +4,9 @@ import './styles.css'
 import Circlegraph from '@/components/Circlegraph';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title } from 'chart.js';
 import { Doughnut, Line } from 'react-chartjs-2';
+import { useState } from 'react';
 import Image from 'next/image';
+import { createHLL } from './functions';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title);
 
@@ -22,7 +24,7 @@ const options = {
 
 const labels = ['HyperLogLog', 'Vector', 'Set'];
 
-const data = {
+const dataMemory = {
   labels,
   datasets: [
     {
@@ -43,7 +45,7 @@ const data = {
   ],
 };
 
-const data2 = {
+const dataTime = {
   labels,
   datasets: [
     {
@@ -55,18 +57,67 @@ const data2 = {
   ],
 };
 
-const operation_type = "create";
+
 
 export default function Page() {
+
+    const [operationType, setOperation] = useState('new_hll');
+    const [selectedP, setSelectedP] = useState(4);
+
+    // States
+    const [P, setP] = useState(4);
+    const [M, setM] = useState(0.0);
+    const [Alpha, setAlpha] = useState(0.0);
+    const [MemoryHLL, setMemoryHLL] = useState(0.0);
+    const [InsertedElements, setInsertedElements] = useState(0);
+
+
+    const mainHLLData={
+      hll:{
+        p: P,
+        m: M,
+        alpha: Alpha,
+        memory: MemoryHLL,
+        insertedElements: InsertedElements,
+      },
+      comparative:{
+        memory_set: 697.5,
+      },
+    }
+    
+
+    function createNewHLL(type) {
+      return async () => {
+        const data = await createHLL(selectedP);
+        console.log(data);
+
+        setP(selectedP);
+        setM(data.info_hll.m);
+        setAlpha(data.info_hll.alpha);
+        setMemoryHLL(data.info_hll.memory_kb);
+        setInsertedElements(data.info_hll.total_inserted_elements);
+        setOperation(type);
+      }
+    }
 
     return (
         <div className='playground-page'>
             <div className='control-panel'>
-              <h1>Hello world</h1>
-              <h1>Hello world aassa as sa sa as as as as sasa</h1>
+              <h1>Create a new HLL object here 📝</h1>
+              <div className='new-hll'>
+                <h2>Select value for &quot;P&quot; (accuracy value) ➡️ </h2>
+                <select name="p" id="p" value={selectedP} onChange={(e) => setSelectedP(e.target.value)}>
+                  {[4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((value) => (
+                    <option key={value} value={value}>{value}</option>
+                  ))}
+                  </select>
+              </div>
+              <div className='create-controls'>
+                  <button type="button" onClick={createNewHLL('create')}>Create</button>
+              </div>
             </div>
             <div className='graphic-panel'>
-              <div className='create'>
+              <div className={`create ${(operationType === "new_hll") ? "":"nonactive"}`}>
                   <h1>Nothing here ツ. Why don&apos;t you start by creating a new HLL?</h1>
                   <br/>
                   <div className='create-content'>
@@ -81,18 +132,18 @@ export default function Page() {
 
                 </div>
 
-              <div className='create nonactive'>
+              <div className={`create ${(operationType === "create") ? "":"nonactive"}`}>
                 <h1>The HyperLogLog Structure was created successfully !!!</h1>
                 <br/>
                 <div className='create-content'>
                   <h1>HyperLogLog features:</h1>
 
                   <div className='features'>
-                    <h2>➡️ P (accuracy value) : 4</h2>
-                    <h2>➡️ M (number of buckets) : 32</h2>
-                    <h2>➡️ Alpha (bias correction factor) : 0.673</h2>
-                    <h2>➡️ Memory : 233.18 Kb</h2>
-                    <h2>➡️ Inserted elements: 0</h2>
+                    <h2>➡️ P (accuracy value) : {mainHLLData.hll.p}</h2>
+                    <h2>➡️ M (number of buckets) : {mainHLLData.hll.m}</h2>
+                    <h2>➡️ Alpha (bias correction factor) : {mainHLLData.hll.alpha}</h2>
+                    <h2>➡️ Memory : {mainHLLData.hll.memory} Kb</h2>
+                    <h2>➡️ Inserted elements: {mainHLLData.hll.insertedElements}</h2>
                   </div>
                   <br/><br/>
                     <Image 
@@ -181,7 +232,7 @@ export default function Page() {
                   <br/><br/>
                   <h1>👾 Memory used (kb) 👾</h1>
                   <div className='graph-1'>
-                      <Doughnut data={data} />
+                      <Doughnut data={dataMemory} />
                   </div>
                   <br/><br/>
                   <h1>⏱️ Execution time (HLL)⏱️</h1>
@@ -226,12 +277,12 @@ export default function Page() {
                   <br/><br/>
                   <h1>👾 Memory used (kb) 👾</h1>
                   <div className='graph-1'>
-                      <Doughnut data={data} />
+                      <Doughnut data={dataMemory} />
                   </div>
                   <br/><br/>
                   <h1>⏱️ Execution time (ms) ⏱️</h1>
                   <div className='graph-1'>
-                      <Line options={options} data={data2} />;
+                      <Line options={options} data={dataTime} />;
                   </div>
               </div>
             </div>

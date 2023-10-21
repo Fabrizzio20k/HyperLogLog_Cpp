@@ -6,7 +6,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearSca
 import { Doughnut, Line } from 'react-chartjs-2';
 import { useState } from 'react';
 import Image from 'next/image';
-import { createHLL } from './functions';
+import { createHLL, insertHLL, infoHLL } from './functions';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title);
 
@@ -71,6 +71,9 @@ export default function Page() {
     const [MemoryHLL, setMemoryHLL] = useState(0.0);
     const [InsertedElements, setInsertedElements] = useState(0);
 
+    //value
+    const [value, setValue] = useState("");
+
 
     const mainHLLData={
       hll:{
@@ -84,14 +87,21 @@ export default function Page() {
         memory_set: 697.5,
       },
     }
-    
 
-    function createNewHLL(type) {
+    function operationHLL(type) {
       return async () => {
-        const data = await createHLL(selectedP);
-        console.log(data);
+        
+        let data = null;
 
-        setP(selectedP);
+        if (type === "create") {
+          data = await createHLL(selectedP);
+        } else if (type === "insert") {
+          data = await insertHLL(value);
+        } else if (type === "info") {
+          data = await infoHLL();
+        }
+
+        setP(data.info_hll.p);
         setM(data.info_hll.m);
         setAlpha(data.info_hll.alpha);
         setMemoryHLL(data.info_hll.memory_kb);
@@ -113,9 +123,33 @@ export default function Page() {
                   </select>
               </div>
               <div className='create-controls'>
-                  <button type="button" onClick={createNewHLL('create')}>Create</button>
+                  <button type="button" onClick={operationHLL('create')}>Create</button>
               </div>
+
+
+              <h1>Insert elements to HLL here ⚡</h1>
+              <div className='new-hll'>
+                <h2>Write any value to insert ➡️ </h2>
+                <input
+                  type="text"
+                  name="insert"
+                  id="insert"
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                />
+              </div>
+              <div className='create-controls skyblue'>
+                  <button type="button" onClick={operationHLL('insert')}>Insert</button>
+              </div>
+
+              <h1>Get information about your HLL object here 📢</h1>
+              <div className='create-controls yellow'>
+                  <button type="button" onClick={operationHLL('info')}>Get it</button>
+              </div>
+
+
             </div>
+
             <div className='graphic-panel'>
               <div className={`create ${(operationType === "new_hll") ? "":"nonactive"}`}>
                   <h1>Nothing here ツ. Why don&apos;t you start by creating a new HLL?</h1>
@@ -155,18 +189,18 @@ export default function Page() {
                 </div>
               </div>
 
-              <div className='insert nonactive'>
+              <div className={`insert ${(operationType === "insert") ? "":"nonactive"}`}>
                 <h1>The element was inserted to HLL successfully !!!</h1>
                   <br/>
                   <div className='create-content'>
                     <h1>HLL information:</h1>
 
                     <div className='features'>
-                      <h2>➡️ P (accuracy value) : 4</h2>
-                      <h2>➡️ M (number of buckets) : 32</h2>
-                      <h2>➡️ Alpha (bias correction factor) : 0.673</h2>
-                      <h2>➡️ Memory : 233.18 Kb</h2>
-                      <h2>➡️ Inserted elements: 1</h2>
+                      <h2>➡️ P (accuracy value) : {mainHLLData.hll.p}</h2>
+                      <h2>➡️ M (number of buckets) : {mainHLLData.hll.m}</h2>
+                      <h2>➡️ Alpha (bias correction factor) : {mainHLLData.hll.alpha}</h2>
+                      <h2>➡️ Memory : {mainHLLData.hll.memory} Kb</h2>
+                      <h2>➡️ Inserted elements: {mainHLLData.hll.insertedElements}</h2>
                     </div>
                       <br/><br/>
                       <Image 
@@ -178,18 +212,20 @@ export default function Page() {
                   </div>
               </div>
 
-              <div className='info nonactive'>
+              <div className={`info ${(operationType === "info") ? "":"nonactive"}`}>
                 <h1>HyperLogLog main information for everyone</h1>
                   <br/>
                   <div className='create-content'>
                     <h1>HLL information:</h1>
 
                     <div className='features'>
-                      <h2>➡️ P (accuracy value) : 4</h2>
-                      <h2>➡️ M (number of buckets) : 32</h2>
-                      <h2>➡️ Alpha (bias correction factor) : 0.673</h2>
-                      <h2>➡️ Memory : 233.18 Kb</h2>
-                      <h2>➡️ Inserted elements: 1</h2>
+                      <div className='features'>
+                        <h2>➡️ P (accuracy value) : {mainHLLData.hll.p}</h2>
+                        <h2>➡️ M (number of buckets) : {mainHLLData.hll.m}</h2>
+                        <h2>➡️ Alpha (bias correction factor) : {mainHLLData.hll.alpha}</h2>
+                        <h2>➡️ Memory : {mainHLLData.hll.memory} Kb</h2>
+                        <h2>➡️ Inserted elements: {mainHLLData.hll.insertedElements}</h2>
+                      </div>
                     </div>
                       <br/><br/>
                       <Image 

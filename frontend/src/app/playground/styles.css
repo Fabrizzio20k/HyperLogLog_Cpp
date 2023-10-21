@@ -51,6 +51,20 @@
     color: white;
 }
   
+.new-hll input{
+    font-family: 'Poppins', sans-serif;
+    width: 30%;
+    height: 30px;
+    padding: 5px;
+    font-size: 16px;
+    margin-left: 40px;
+    background-color: #04171f;
+    border-radius: 5px;
+    border: 2px solid #ccc;
+    font-weight: bold;
+    color: white;
+}
+
   .create-controls {
     display: flex;
     flex-direction: row; /* Cambia la dirección a columna en pantallas pequeñas */
@@ -76,6 +90,27 @@
     background-color: #00b679;
     color: #003021;
 }
+
+.create-controls.skyblue button{
+    background-color: #003030;
+    border: 2px solid #00e1ff;
+}
+
+.create-controls.skyblue button:hover{
+    background-color: #009bb6;
+    color: #003030;
+}
+
+.create-controls.yellow button{
+    background-color: #2f3000;
+    border: 2px solid #fbff00;
+}
+
+.create-controls.yellow button:hover{
+    background-color: #c7ca00;
+    color: #2d3000;
+}
+
 
 .graphic-panel{
     width: 40%;
@@ -190,12 +225,20 @@
         width: 100%;
     }
 
+    .control-panel h1{
+        text-align: center;
+    }
+
     .new-hll{
         flex-direction: column; 
     }
     .new-hll select{
         margin-left: 0;
     }
+    .new-hll input{
+        margin-left: 0;
+    }
+
     .create-controls{
         align-items: center;
         justify-content: center;

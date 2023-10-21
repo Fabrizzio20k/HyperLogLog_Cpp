@@ -1,4 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+
+.nonactive{
+  display: none !important;
+}
+
 .playground-page{
+    font-family: 'Poppins', sans-serif;
     color: white;
     min-height: 100vh;
     display: flex;
@@ -9,76 +17,38 @@
 
 .control-panel{
     width: 60%;
-    border: yellow 3px solid;
     padding: 0 10px;
+    border-right: 3px solid transparent;
+    border-image: linear-gradient(to top, transparent, white, transparent) 100%;
+    border-image-slice: 1;
 }
 
 .graphic-panel{
     width: 40%;
     padding: 0 10px;
-    border: yellow 3px solid;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-
-
-.flex-wrapper {
+.comparative{
     display: flex;
-    flex-flow: row nowrap;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    width: 90%;
-  }
-  
-  .single-chart {
-    width: 30%;
-    justify-content: space-around ;
-  }
-  
-  .circular-chart {
-    display: block;
-    margin: 10px auto;
-    min-width: 80%;
-    max-height: 250px;
-  }
-  
-  .circle-bg {
-    fill: none;
-    stroke: #eee;
-    stroke-width: 3.8;
-  }
-  
-  .circle {
-    fill: none;
-    stroke-width: 2.8;
-    stroke-linecap: round;
-    animation: progress 1s ease-out forwards;
-  }
-  
-  @keyframes progress {
-    0% {
-      stroke-dasharray: 0 100;
-    }
-  }
-  
-  .circular-chart.orange .circle {
-    stroke: #009952;
-  }
-  
-  
-  .percentage {
-    fill: #ffffff;
-    font-family: sans-serif;
-    font-size: 0.5em;
-    text-anchor: middle;
-  }
+}
 
+.comparative h1{
+  text-align: center;
+}
 
+.graph-1{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80%;
+}
 
 @media screen and (max-width: 768px){
     .playground-page{
@@ -89,5 +59,10 @@
     }
     .graphic-panel{
         width: 100%;
+    }
+    .control-panel{
+        border-bottom: 3px solid transparent;
+        border-image: linear-gradient(to right, transparent, white, transparent) 100%;
+        border-image-slice: 1;
     }
 }

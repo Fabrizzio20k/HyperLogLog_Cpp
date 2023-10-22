@@ -6,7 +6,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearSca
 import { Doughnut, Line } from 'react-chartjs-2';
 import { useState } from 'react';
 import Image from 'next/image';
-import { createHLL, insertHLL, infoHLL, resetHLL, countHLL, uploadHLLFile } from './functions';
+import { createHLL, insertHLL, infoHLL, resetHLL, countHLL, uploadHLLFile, listCSVFiles } from './functions';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title);
 
@@ -24,7 +24,6 @@ const options = {
 
 const labels = ['HyperLogLog', 'Vector', 'Set'];
 
-
 export default function Page() {
 
     //values to send to backend
@@ -32,6 +31,7 @@ export default function Page() {
     const [selectedP, setSelectedP] = useState(4);
     const [value, setValue] = useState("");
     const [upload, setUpload] = useState(false);
+    const [filesList, setFilesList] = useState([]);
 
     // States
     const [P, setP] = useState(4);
@@ -112,6 +112,7 @@ export default function Page() {
 
         if (data) {
           if (data.status === "success") {
+
             setUpload(true);
     
             setTimeout(() => {
@@ -119,6 +120,14 @@ export default function Page() {
             }, 3000);
           }
         }
+    }
+
+    async function setCSVFiles() {
+      const data = await listCSVFiles();
+      if (data){
+        setFilesList(data.files);
+      }
+      setFilesList([]);
     }
 
     function operationHLL(type) {
@@ -208,13 +217,30 @@ export default function Page() {
                   <button type="button" onClick={operationHLL('count')}>Count now</button>
               </div>
 
-              <h1>Upload a new .csv to count different elements here ✨</h1>
+              <h1>Upload a new .csv file to count different elements from that here 📄</h1>
               <div className='create-controls green'>
                 <input type="file" id="file" name="file" accept=".csv" onChange={uploadCSV} />
                 <label htmlFor="file" id="file-label">Upload csv</label>
                 <span className={`selected-file-name ${upload ? "" : "nonupload"}`}>
-                  {upload ? "The file was uploaded successfully" : "Only .csv files here"}
+                  {upload ? "The file was uploaded successfully" : "Any .csv file uploaded yet"}
                 </span>
+              </div>
+
+              <h1>Or select a .csv File from our repository, select a Column Name and see the magic here 🔥</h1>
+              <div className='new-hll'>
+                <h2>Select a &quot;.csv&quot; file ➡️ </h2>
+                <select name="p" id="p" value={selectedP} onChange={(e) => setSelectedP(e.target.value)}>
+                  {[4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((value) => (
+                    <option key={value} value={value}>{value}</option>
+                  ))}
+                  </select>
+              </div>
+              <div className='create-controls'>
+                  <button type="button" onClick={setCSVFiles}>Count HLL</button>
+              </div>
+              
+              <div className='create-controls'>
+                <button type="button" onClick={setCSVFiles}>Compare count</button>
               </div>
 
               <h1>Reset your HLL here 🫧</h1>

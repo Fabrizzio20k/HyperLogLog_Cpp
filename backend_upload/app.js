@@ -3,24 +3,22 @@ const multer = require('multer');
 const path = require('path');
 const app = express();
 const cors = require('cors');
-
-// Configura multer para guardar los archivos subidos en la carpeta 'mock' con su nombre original
+const fs = require('fs');
 
 app.use(cors());
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, '../mock/')
+    cb(null, '../mock/');
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname)
+    cb(null, file.originalname);
   }
-})
+});
 
 const upload = multer({ storage: storage });
 
 app.post('/upload', upload.single('file'), (req, res) => {
-  // req.file contiene información sobre el archivo subido
   const data = {
     "file": req.file,
     "body": req.body,
@@ -29,6 +27,19 @@ app.post('/upload', upload.single('file'), (req, res) => {
   };
 
   res.send(data);
+});
+
+app.get('/listFiles', (req, res) => {
+  // Lee el contenido de la carpeta "../mock"
+  fs.readdir('../mock', (err, files) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Error al listar archivos', status: 'error' });
+    } else {
+      // Envia la lista de nombres de archivos como respuesta
+      res.json({ files, message: 'Lista de archivos en la carpeta ../mock', status: 'success' });
+    }
+  });
 });
 
 app.listen(5001, () => {

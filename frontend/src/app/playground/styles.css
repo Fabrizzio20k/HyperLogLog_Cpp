@@ -86,6 +86,64 @@
     transition: 0.5s;
 }
 
+.create-controls input[type="file"] {
+    display: none; /* Oculta el input original */
+}
+
+.create-controls label {
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #003021;
+    color: white;
+    width: 25%;
+    height: 50px;
+    border-radius: 5px;
+    border: 2px solid #00ffaa;
+    font-size: 16px;
+    transition: 0.5s;
+    display: inline-block;
+    text-align: center;
+    line-height: 50px;
+}
+
+.create-controls span{
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: rgb(0, 255, 136);
+    width: 50%;
+    font-size: 16px;
+    margin-left: 20px;
+    text-align: left;
+}
+
+.nonupload{
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: rgb(217, 255, 0) !important;
+    width: 50%;
+    font-size: 16px;
+    margin-left: 20px;
+    text-align: left;
+}
+
+.create-controls label:hover {
+    background-color: #00b679;
+    color: #003021;
+}
+
+/* Estiliza el input oculto */
+.create-controls input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    z-index: -1;
+}
+
+/* Añade un estilo personalizado al label cuando se selecciona un archivo */
+.create-controls input[type="file"]:focus + label {
+    box-shadow: 0 0 5px 2px #00ffaa;
+}
+
 .create-controls button:hover{
     background-color: #00b679;
     color: #003021;

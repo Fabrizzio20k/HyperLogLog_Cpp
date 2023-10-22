@@ -6,7 +6,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearSca
 import { Doughnut, Line } from 'react-chartjs-2';
 import { useState } from 'react';
 import Image from 'next/image';
-import { createHLL, insertHLL, infoHLL, resetHLL, countHLL } from './functions';
+import { createHLL, insertHLL, infoHLL, resetHLL, countHLL, uploadHLLFile } from './functions';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title);
 
@@ -31,6 +31,7 @@ export default function Page() {
     const [operationType, setOperation] = useState('new_hll');
     const [selectedP, setSelectedP] = useState(4);
     const [value, setValue] = useState("");
+    const [upload, setUpload] = useState(false);
 
     // States
     const [P, setP] = useState(4);
@@ -100,6 +101,25 @@ export default function Page() {
       ],
     };
 
+    async function uploadCSV(event) {
+        const selectedFile = event.target.files[0];
+
+        const formData = new FormData();
+
+        formData.append("file", selectedFile);
+
+        const data = await uploadHLLFile(formData);
+
+        if (data) {
+          if (data.status === "success") {
+            setUpload(true);
+    
+            setTimeout(() => {
+              setUpload(false);
+            }, 3000);
+          }
+        }
+    }
 
     function operationHLL(type) {
       return async () => {
@@ -114,6 +134,8 @@ export default function Page() {
           data = await infoHLL();
         } else if (type === "count"){
           data = await countHLL();
+        } else if (type === "reset"){
+          data = await resetHLL();
         }
 
         if (type !== "count") {
@@ -184,6 +206,15 @@ export default function Page() {
               <h1>Count the elements of your HLL here ✨</h1>
               <div className='create-controls purple'>
                   <button type="button" onClick={operationHLL('count')}>Count now</button>
+              </div>
+
+              <h1>Upload a new .csv to count different elements here ✨</h1>
+              <div className='create-controls green'>
+                <input type="file" id="file" name="file" accept=".csv" onChange={uploadCSV} />
+                <label htmlFor="file" id="file-label">Upload csv</label>
+                <span className={`selected-file-name ${upload ? "" : "nonupload"}`}>
+                  {upload ? "The file was uploaded successfully" : "Only .csv files here"}
+                </span>
               </div>
 
               <h1>Reset your HLL here 🫧</h1>

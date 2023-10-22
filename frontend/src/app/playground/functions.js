@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const linkAPI = "http://0.0.0.0:5000/api/v1/hyperloglog/";
+const linkUpload = "http://localhost:5001/upload"
 
 export const createHLL = async (p) => {
     try {
@@ -47,6 +48,15 @@ export const resetHLL = async () => {
 export const countHLL = async () => {
     try {
         const { data } = await axios.get(linkAPI + "count");
+        return data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const uploadHLLFile = async (file_formData) => {
+    try {
+        const { data } = await axios.post(linkUpload, file_formData);
         return data;
     } catch (error) {
         console.log(error);

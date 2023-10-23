@@ -4,7 +4,7 @@ import './styles.css'
 import Circlegraph from '@/components/Circlegraph';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title } from 'chart.js';
 import { Doughnut, Line } from 'react-chartjs-2';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { createHLL, insertHLL, infoHLL, resetHLL, countHLL, uploadHLLFile, listCSVFiles } from './functions';
 
@@ -32,6 +32,8 @@ export default function Page() {
     const [value, setValue] = useState("");
     const [upload, setUpload] = useState(false);
     const [filesList, setFilesList] = useState([]);
+    const [selectedFile, setSelectedFile] = useState("");
+    const [column, setColumn] = useState("");
 
     // States
     const [P, setP] = useState(4);
@@ -114,6 +116,11 @@ export default function Page() {
           if (data.status === "success") {
 
             setUpload(true);
+            
+            const dataFiles = await getCSVFiles();
+            if (dataFiles){
+              setFilesList(dataFiles);
+            }
     
             setTimeout(() => {
               setUpload(false);
@@ -122,12 +129,17 @@ export default function Page() {
         }
     }
 
-    async function setCSVFiles() {
+    async function getCSVFiles() {
       const data = await listCSVFiles();
       if (data){
-        setFilesList(data.files);
+        return data.files;
       }
-      setFilesList([]);
+      return [];
+    }
+
+    function prueba(){
+      console.log(selectedFile);
+      console.log(column);
     }
 
     function operationHLL(type) {
@@ -145,6 +157,10 @@ export default function Page() {
           data = await countHLL();
         } else if (type === "reset"){
           data = await resetHLL();
+        } else if (type === "count_hll"){
+
+        } else {
+          
         }
 
         if (type !== "count") {
@@ -174,6 +190,16 @@ export default function Page() {
 
       } 
     }
+
+    useEffect(() => {
+      async function setFilesArray(){
+        const data = await getCSVFiles();
+        if (data){
+          setFilesList(data);
+        }
+      }
+      setFilesArray();
+    }, []);
 
     return (
         <div className='playground-page'>
@@ -229,18 +255,29 @@ export default function Page() {
               <h1>Or select a .csv File from our repository, select a Column Name and see the magic here 🔥</h1>
               <div className='new-hll'>
                 <h2>Select a &quot;.csv&quot; file ➡️ </h2>
-                <select name="p" id="p" value={selectedP} onChange={(e) => setSelectedP(e.target.value)}>
-                  {[4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((value) => (
+                <select name="file" id="file" value={selectedFile} onChange={(e) => setSelectedFile(e.target.value)}>
+                  {filesList.map((value) => (
                     <option key={value} value={value}>{value}</option>
                   ))}
                   </select>
               </div>
+              <div className='new-hll'>
+                <h2>Write the name of the column ➡️ </h2>
+                <input
+                  className='green-input'
+                  type="text"
+                  name="insert"
+                  id="insert"
+                  value={column}
+                  onChange={(e) => setColumn(e.target.value)}
+                />
+              </div>
               <div className='create-controls'>
-                  <button type="button" onClick={setCSVFiles}>Count HLL</button>
+                  <button type="button" onClick={prueba}>Count HLL</button>
               </div>
               
               <div className='create-controls'>
-                <button type="button" onClick={setCSVFiles}>Compare count</button>
+                <button type="button" onClick={prueba}>Compare count</button>
               </div>
 
               <h1>Reset your HLL here 🫧</h1>

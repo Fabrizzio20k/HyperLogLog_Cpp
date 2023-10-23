@@ -27,7 +27,7 @@
 .control-panel h1{
     text-align: left;
     font-weight: bold;
-    font-size: 40px;
+    font-size: 2em;
 }
 
 .new-hll {
@@ -65,11 +65,19 @@
     color: white;
 }
 
+.green-input{
+
+    background-color: #041f12 !important;
+
+}
+
   .create-controls {
     display: flex;
     flex-direction: row; /* Cambia la dirección a columna en pantallas pequeñas */
     align-items: center; /* Alinea los elementos al centro en pantallas pequeñas */
     justify-content: left;
+    margin-bottom: 20px;
+    margin-top: 20px;
   }
 
 .create-controls button{

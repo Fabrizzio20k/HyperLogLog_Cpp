@@ -6,7 +6,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearSca
 import { Doughnut, Line } from 'react-chartjs-2';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { createHLL, insertHLL, infoHLL, resetHLL, countHLL, uploadHLLFile, listCSVFiles } from './functions';
+import { createHLL, insertHLL, infoHLL, resetHLL, countHLL, uploadHLLFile, listCSVFiles, countCSVHLL } from './functions';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title);
 
@@ -32,7 +32,7 @@ export default function Page() {
     const [value, setValue] = useState("");
     const [upload, setUpload] = useState(false);
     const [filesList, setFilesList] = useState([]);
-    const [selectedFile, setSelectedFile] = useState("");
+    const [selectedFile, setSelectedFile] = useState("MOCK_DATA.csv");
     const [column, setColumn] = useState("");
 
     // States
@@ -137,11 +137,6 @@ export default function Page() {
       return [];
     }
 
-    function prueba(){
-      console.log(selectedFile);
-      console.log(column);
-    }
-
     function operationHLL(type) {
       return async () => {
         
@@ -157,13 +152,13 @@ export default function Page() {
           data = await countHLL();
         } else if (type === "reset"){
           data = await resetHLL();
-        } else if (type === "count_hll"){
-
+        } else if (type === "csv_hll"){
+          data = await countCSVHLL(selectedFile, column);
         } else {
           
         }
 
-        if (type !== "count") {
+        if (type !== "count" && type !== "csv_hll") {
           setP(data.info_hll.p);
           setM(data.info_hll.m);
           setAlpha(data.info_hll.alpha);
@@ -179,11 +174,15 @@ export default function Page() {
           setInsertedElements(data.hll.info_hll.total_inserted_elements);
           setCountHLL(data.hll.count_hll);
           setTimeHLL(data.hll.time_hll);
-          setPrecision(data.hll.precision.toFixed(2));
-          setCountVector(data.comparative.info_comp.values_vector);
-          setCountSet(data.comparative.info_comp.values_set);
-          setMemoryVector(data.comparative.info_comp.memory_vector_kb);
-          setMemorySet(data.comparative.info_comp.memory_set_kb);
+
+          if (type !== "csv_hll"){
+            setPrecision(data.hll.precision);
+            setCountVector(data.comparative.info_comp.values_vector);
+            setCountSet(data.comparative.info_comp.values_set);
+            setMemoryVector(data.comparative.info_comp.memory_vector_kb);
+            setMemorySet(data.comparative.info_comp.memory_set_kb);
+          }
+          
         }
 
         setOperation(type);
@@ -273,11 +272,11 @@ export default function Page() {
                 />
               </div>
               <div className='create-controls'>
-                  <button type="button" onClick={prueba}>Count HLL</button>
+                  <button type="button" onClick={operationHLL('csv_hll')}>Count HLL</button>
               </div>
               
               <div className='create-controls'>
-                <button type="button" onClick={prueba}>Compare count</button>
+                <button type="button" onClick={operationHLL('csv_hll')}>Compare count</button>
               </div>
 
               <h1>Reset your HLL here 🫧</h1>
@@ -410,21 +409,21 @@ export default function Page() {
                   <h1>👉🏻 {mainHLLData.hll.time_hll} ms</h1>
               </div>
 
-              <div className='count-hll nonactive'>
+              <div className={`count ${(operationType === "csv_hll") ? "":"nonactive"}`}>
                 <h1>HyperLogLog CSV-Insertion</h1>
                 <br/>
                 <h1>⬇️ Total count of HyperLogLog ⬇️</h1>
-                  <h1>👉🏻 99872.423 elements</h1>
+                  <h1>👉🏻 {mainHLLData.hll.count_hll} elements</h1>
                     
                     <div className='create-content'>
                       <h1>HLL information:</h1>
 
                       <div className='features'>
-                        <h2>➡️ P (accuracy value) : 4</h2>
-                        <h2>➡️ M (number of buckets) : 32</h2>
-                        <h2>➡️ Alpha (bias correction factor) : 0.673</h2>
-                        <h2>➡️ Memory : 233.18 Kb</h2>
-                        <h2>➡️ Inserted elements: 109090</h2>
+                        <h2>➡️ P (accuracy value) : {mainHLLData.hll.p}</h2>
+                        <h2>➡️ M (number of buckets) : {mainHLLData.hll.m}</h2>
+                        <h2>➡️ Alpha (bias correction factor) : {mainHLLData.hll.alpha}</h2>
+                        <h2>➡️ Memory : {mainHLLData.hll.memory} Kb</h2>
+                        <h2>➡️ Inserted elements: {mainHLLData.hll.insertedElements}</h2>
                       </div>
                     </div>
                   
@@ -441,7 +440,7 @@ export default function Page() {
               </div>
 
               <div className='comparative nonactive'>
-                  <h3>Total count of elements: 100000</h3>
+                  <h3>Total count of elements: {mainHLLData.insertedElements}</h3>
                   <h1>⬇️ Total count of HyperLogLog ⬇️</h1>
                   <h1>👉🏻 99872.423 elements</h1>
                   <Circlegraph percentage={79.82} color={"skyblue"} message = {`${79.82}% accuracy compared to <vector> and <set> structures`}/>

@@ -37,6 +37,7 @@ export default function Page() {
     const [column, setColumn] = useState("email");
     const [isCreated, setCreated] = useState(false);
     const [isPossibleCount, setPossibleCount] = useState(false);
+    const [isLoading, setLoading] = useState(false);
 
     // States
     const [P, setP] = useState(4);
@@ -149,27 +150,41 @@ export default function Page() {
         let data = null;
 
         if (type === "create") {
+          setLoading(true);
           data = await createHLL(selectedP);
           setCreated(true);
+          setLoading(false);
         } else if (type === "insert") {
+          setLoading(true);
           data = await insertHLL(value);
           setPossibleCount(true);
-
+          setLoading(false);
         } else if (type === "info") {
+          setLoading(true);
           data = await infoHLL();
+          setLoading(false);
         } else if (type === "count"){
+          setLoading(true);
           data = await countHLL();
-          
+          setLoading(false);
         } else if (type === "reset"){
+          setLoading(true);
           data = await resetHLL();
           setCreated(false);
           setPossibleCount(false);
+          setOperation("new_hll");
+          setLoading(false);
+          return;
         } else if (type === "csv_hll"){
+          setLoading(true);
           data = await countCSVHLL(selectedFile, column);
           setPossibleCount(false);
+          setLoading(false);
         } else {
+          setLoading(true);
           data = await countCSVCompare(selectedFile, column);
           setPossibleCount(false);
+          setLoading(false);
         }
 
         if (type !== "count" && type !== "csv_hll" && type !== "comparative") {
@@ -305,134 +320,53 @@ export default function Page() {
             </div>
 
             <div className='graphic-panel'>
-              <div className={`create ${(operationType === "new_hll") ? "":"nonactive"}`}>
-                  <h1>Nothing here ツ. Why don&apos;t you start by creating a new HLL?</h1>
+              <div className={`loader ${isLoading ? "":"nonactive"}`}>
+                <div id="preloader">
+                  <div id="loader"></div>
+                </div>
+              </div>
+              <div className={`content ${isLoading ? "nonactive":""}`}>
+                <div className={`create ${(operationType === "new_hll") ? "":"nonactive"}`}>
+                    <h1>Nothing here ツ. Why don&apos;t you start by creating a new HLL?</h1>
+                    <br/>
+                    <div className='create-content'>
+                      <br/><br/>
+                        <Image 
+                          src='/new_file.png'
+                          alt='structure'
+                          width={300}
+                          height={300}
+                        />
+                    </div>
+
+                  </div>
+
+                <div className={`create ${(operationType === "create") ? "":"nonactive"}`}>
+                  <h1>The HyperLogLog Structure was created successfully !!!</h1>
                   <br/>
                   <div className='create-content'>
+                    <h1>HyperLogLog features:</h1>
+
+                    <div className='features'>
+                      <h2>➡️ P (accuracy value) : {mainHLLData.hll.p}</h2>
+                      <h2>➡️ M (number of buckets) : {mainHLLData.hll.m}</h2>
+                      <h2>➡️ Alpha (bias correction factor) : {mainHLLData.hll.alpha}</h2>
+                      <h2>➡️ Memory : {mainHLLData.hll.memory} Kb</h2>
+                      <h2>➡️ Inserted elements: {mainHLLData.hll.insertedElements}</h2>
+                    </div>
                     <br/><br/>
                       <Image 
-                        src='/new_file.png'
+                        src='/structure.png'
                         alt='structure'
                         width={300}
                         height={300}
                       />
                   </div>
-
                 </div>
 
-              <div className={`create ${(operationType === "create") ? "":"nonactive"}`}>
-                <h1>The HyperLogLog Structure was created successfully !!!</h1>
-                <br/>
-                <div className='create-content'>
-                  <h1>HyperLogLog features:</h1>
-
-                  <div className='features'>
-                    <h2>➡️ P (accuracy value) : {mainHLLData.hll.p}</h2>
-                    <h2>➡️ M (number of buckets) : {mainHLLData.hll.m}</h2>
-                    <h2>➡️ Alpha (bias correction factor) : {mainHLLData.hll.alpha}</h2>
-                    <h2>➡️ Memory : {mainHLLData.hll.memory} Kb</h2>
-                    <h2>➡️ Inserted elements: {mainHLLData.hll.insertedElements}</h2>
-                  </div>
-                  <br/><br/>
-                    <Image 
-                      src='/structure.png'
-                      alt='structure'
-                      width={300}
-                      height={300}
-                    />
-                </div>
-              </div>
-
-              <div className={`insert ${(operationType === "insert") ? "":"nonactive"}`}>
-                <h1>The element was inserted to HLL successfully !!!</h1>
-                  <br/>
-                  <div className='create-content'>
-                    <h1>HLL information:</h1>
-
-                    <div className='features'>
-                      <h2>➡️ P (accuracy value) : {mainHLLData.hll.p}</h2>
-                      <h2>➡️ M (number of buckets) : {mainHLLData.hll.m}</h2>
-                      <h2>➡️ Alpha (bias correction factor) : {mainHLLData.hll.alpha}</h2>
-                      <h2>➡️ Memory : {mainHLLData.hll.memory} Kb</h2>
-                      <h2>➡️ Inserted elements: {mainHLLData.hll.insertedElements}</h2>
-                    </div>
-                      <br/><br/>
-                      <Image 
-                        src='/insert.png'
-                        alt='structure'
-                        width={300}
-                        height={300}
-                      />
-                  </div>
-              </div>
-
-              <div className={`info ${(operationType === "info") ? "":"nonactive"}`}>
-                <h1>HyperLogLog main information for everyone</h1>
-                  <br/>
-                  <div className='create-content'>
-                    <h1>HLL information:</h1>
-                      <div className='features'>
-                        <h2>➡️ P (accuracy value) : {mainHLLData.hll.p}</h2>
-                        <h2>➡️ M (number of buckets) : {mainHLLData.hll.m}</h2>
-                        <h2>➡️ Alpha (bias correction factor) : {mainHLLData.hll.alpha}</h2>
-                        <h2>➡️ Memory : {mainHLLData.hll.memory} Kb</h2>
-                        <h2>➡️ Inserted elements: {mainHLLData.hll.insertedElements}</h2>
-                      </div>
-                      <br/><br/>
-                      <Image 
-                        src='/information.png'
-                        alt='structure'
-                        width={450}
-                        height={300}
-                      />
-                  </div>
-              </div>
-
-              <div className={`reset ${(operationType === "reset") ? "":"nonactive"}`}>
-                <h1>HyperLogLog was restored successfully !!!</h1>
-                  <br/>
-                  <div className='create-content'>
-                    <h1>HLL information:</h1>
-
-                    <div className='features'>
-                      <h2>➡️ P (accuracy value) : {mainHLLData.hll.p}</h2>
-                      <h2>➡️ M (number of buckets) : {mainHLLData.hll.m}</h2>
-                      <h2>➡️ Alpha (bias correction factor) : {mainHLLData.hll.alpha}</h2>
-                      <h2>➡️ Memory : {mainHLLData.hll.memory} Kb</h2>
-                      <h2>➡️ Inserted elements: {mainHLLData.hll.insertedElements}</h2>
-                    </div>
-                      <br/><br/>
-                      <Image 
-                        src='/restore.png'
-                        alt='structure'
-                        width={350}
-                        height={350}
-                      />
-                  </div>
-              </div>
-
-              <div className={`count ${(operationType === "count") ? "":"nonactive"}`}>
-                  <h3>Total elements inserted: {mainHLLData.hll.insertedElements}</h3>
-                  <h3>Total different elements inserted: {mainHLLData.comparative.count_set}</h3>
-                  <h1>⬇️ Total count of HyperLogLog ⬇️</h1>
-                  <h1>👉🏻 {mainHLLData.hll.count_hll} elements</h1>
-                  <Circlegraph percentage={mainHLLData.hll.precision} color={"skyblue"} message = {`${mainHLLData.hll.precision}% accuracy compared to <vector> and <set> structures`}/>
-                  <br/><br/>
-                  <h1>👾 Memory used (kb) 👾</h1>
-                  <div className='graph-1'>
-                      <Doughnut data={dataMemory} />
-                  </div>
-                  <br/><br/>
-                  <h1>⏱️ Execution time (HLL)⏱️</h1>
-                  <h1>👉🏻 {mainHLLData.hll.time_hll} ms</h1>
-              </div>
-
-              <div className={`count ${(operationType === "csv_hll") ? "":"nonactive"}`}>
-                <h1>HyperLogLog CSV-Insertion</h1>
-                <br/>
-                <h1>⬇️ Total count of HyperLogLog ⬇️</h1>
-                  <h1>👉🏻 {mainHLLData.hll.count_hll} elements</h1>
-                    
+                <div className={`insert ${(operationType === "insert") ? "":"nonactive"}`}>
+                  <h1>The element was inserted to HLL successfully !!!</h1>
+                    <br/>
                     <div className='create-content'>
                       <h1>HLL information:</h1>
 
@@ -443,47 +377,139 @@ export default function Page() {
                         <h2>➡️ Memory : {mainHLLData.hll.memory} Kb</h2>
                         <h2>➡️ Inserted elements: {mainHLLData.hll.insertedElements}</h2>
                       </div>
-                    </div>
-                  
-                  <h1>⏱️ Execution time (HLL)⏱️</h1>
-                  <h1>👉🏻 {mainHLLData.hll.time_hll} ms</h1>
-
-                  <br/><br/>
+                        <br/><br/>
                         <Image 
-                          src='/csv_logo.png'
+                          src='/insert.png'
                           alt='structure'
                           width={300}
                           height={300}
                         />
-              </div>
-
-              <div className={`comparative ${(operationType === "comparative") ? "":"nonactive"}`}>
-                  <h3>Total elements inserted: {mainHLLData.hll.insertedElements}</h3>
-                  <h3>Total different elements inserted: {mainHLLData.comparative.count_set}</h3>
-                  <h1>⬇️ Total count of HyperLogLog ⬇️</h1>
-                  <h1>👉🏻 {mainHLLData.hll.count_hll} elements</h1>
-                  <Circlegraph percentage={mainHLLData.hll.precision} color={"skyblue"} message = {`${mainHLLData.hll.precision}% accuracy compared to <vector> and <set> structures`}/>
-                  <br/><br/>
-                  <h1>👾 Memory used (kb) 👾</h1>
-                  <div className='graph-1'>
-                      <Doughnut data={dataMemory} />
-                  </div>
-                  <br/>
-                  <h3>👾 Memory used (HLL) 👾 👉🏻 {mainHLLData.hll.memory} kb</h3>
-                  <h3>👾 Memory used (Vector) 👾 👉🏻 {mainHLLData.comparative.memory_vector} kb</h3>
-                  <h3>👾 Memory used (Set) 👾 👉🏻 {mainHLLData.comparative.memory_set} kb</h3>
-                  <br/><br/><br/>
-                  <h1>⏱️ Execution time (ms) ⏱️</h1>
-                  <Suspense fallback={<div>Loading...</div>}>
-                    <div className='graph-1'>
-                      <Bar options={options} data={dataTime} />
                     </div>
-                  </Suspense>
+                </div>
 
-                  <br/><br/>
-                  <h3>⏱️ Execution time (HLL) ⏱️ 👉🏻 {mainHLLData.hll.time_hll} ms</h3>
-                  <h3>⏱️ Execution time (Vector) ⏱️ 👉🏻 {mainHLLData.comparative.time_vector} ms</h3>
-                  <h3>⏱️ Execution time (Set) ⏱️ 👉🏻 {mainHLLData.comparative.time_set} ms</h3>
+                <div className={`info ${(operationType === "info") ? "":"nonactive"}`}>
+                  <h1>HyperLogLog main information for everyone</h1>
+                    <br/>
+                    <div className='create-content'>
+                      <h1>HLL information:</h1>
+                        <div className='features'>
+                          <h2>➡️ P (accuracy value) : {mainHLLData.hll.p}</h2>
+                          <h2>➡️ M (number of buckets) : {mainHLLData.hll.m}</h2>
+                          <h2>➡️ Alpha (bias correction factor) : {mainHLLData.hll.alpha}</h2>
+                          <h2>➡️ Memory : {mainHLLData.hll.memory} Kb</h2>
+                          <h2>➡️ Inserted elements: {mainHLLData.hll.insertedElements}</h2>
+                        </div>
+                        <br/><br/>
+                        <Image 
+                          src='/information.png'
+                          alt='structure'
+                          width={450}
+                          height={300}
+                        />
+                    </div>
+                </div>
+
+                <div className={`reset ${(operationType === "reset") ? "":"nonactive"}`}>
+                  <h1>HyperLogLog was restored successfully !!!</h1>
+                    <br/>
+                    <div className='create-content'>
+                      <h1>HLL information:</h1>
+
+                      <div className='features'>
+                        <h2>➡️ P (accuracy value) : {mainHLLData.hll.p}</h2>
+                        <h2>➡️ M (number of buckets) : {mainHLLData.hll.m}</h2>
+                        <h2>➡️ Alpha (bias correction factor) : {mainHLLData.hll.alpha}</h2>
+                        <h2>➡️ Memory : {mainHLLData.hll.memory} Kb</h2>
+                        <h2>➡️ Inserted elements: {mainHLLData.hll.insertedElements}</h2>
+                      </div>
+                        <br/><br/>
+                        <Image 
+                          src='/restore.png'
+                          alt='structure'
+                          width={350}
+                          height={350}
+                        />
+                    </div>
+                </div>
+
+                <div className={`count ${(operationType === "count") ? "":"nonactive"}`}>
+                    <h3>Total elements inserted: {mainHLLData.hll.insertedElements}</h3>
+                    <h3>Total different elements inserted: {mainHLLData.comparative.count_set}</h3>
+                    <h1>⬇️ Total count of HyperLogLog ⬇️</h1>
+                    <h1>👉🏻 {mainHLLData.hll.count_hll} elements</h1>
+                    <Circlegraph percentage={mainHLLData.hll.precision} color={"skyblue"} message = {`${mainHLLData.hll.precision}% accuracy compared to <vector> and <set> structures`}/>
+                    <br/><br/>
+                    <h1>👾 Memory used (kb) 👾</h1>
+                    <div className='graph-1'>
+                        <Doughnut data={dataMemory} />
+                    </div>
+                    <br/>
+                    <h3>👾 Memory used (HLL) 👾 👉🏻 {mainHLLData.hll.memory} kb</h3>
+                    <h3>👾 Memory used (Vector) 👾 👉🏻 {mainHLLData.comparative.memory_vector} kb</h3>
+                    <h3>👾 Memory used (Set) 👾 👉🏻 {mainHLLData.comparative.memory_set} kb</h3>
+                    <br/><br/>
+                    <h1>⏱️ Execution time (HLL)⏱️</h1>
+                    <h1>👉🏻 {mainHLLData.hll.time_hll} ms</h1>
+                </div>
+
+                <div className={`count ${(operationType === "csv_hll") ? "":"nonactive"}`}>
+                  <h1>HyperLogLog CSV-Insertion</h1>
+                  <br/>
+                  <h1>⬇️ Total count of HyperLogLog ⬇️</h1>
+                    <h1>👉🏻 {mainHLLData.hll.count_hll} elements</h1>
+                      
+                      <div className='create-content'>
+                        <h1>HLL information:</h1>
+
+                        <div className='features'>
+                          <h2>➡️ P (accuracy value) : {mainHLLData.hll.p}</h2>
+                          <h2>➡️ M (number of buckets) : {mainHLLData.hll.m}</h2>
+                          <h2>➡️ Alpha (bias correction factor) : {mainHLLData.hll.alpha}</h2>
+                          <h2>➡️ Memory : {mainHLLData.hll.memory} Kb</h2>
+                          <h2>➡️ Inserted elements: {mainHLLData.hll.insertedElements}</h2>
+                        </div>
+                      </div>
+                    
+                    <h1>⏱️ Execution time (HLL)⏱️</h1>
+                    <h1>👉🏻 {mainHLLData.hll.time_hll} ms</h1>
+
+                    <br/><br/>
+                          <Image 
+                            src='/csv_logo.png'
+                            alt='structure'
+                            width={300}
+                            height={300}
+                          />
+                </div>
+
+                <div className={`comparative ${(operationType === "comparative") ? "":"nonactive"}`}>
+                    <h3>Total elements inserted: {mainHLLData.hll.insertedElements}</h3>
+                    <h3>Total different elements inserted: {mainHLLData.comparative.count_set}</h3>
+                    <h1>⬇️ Total count of HyperLogLog ⬇️</h1>
+                    <h1>👉🏻 {mainHLLData.hll.count_hll} elements</h1>
+                    <Circlegraph percentage={mainHLLData.hll.precision} color={"skyblue"} message = {`${mainHLLData.hll.precision}% accuracy compared to <vector> and <set> structures`}/>
+                    <br/><br/>
+                    <h1>👾 Memory used (kb) 👾</h1>
+                    <div className='graph-1'>
+                        <Doughnut data={dataMemory} />
+                    </div>
+                    <br/>
+                    <h3>👾 Memory used (HLL) 👾 👉🏻 {mainHLLData.hll.memory} kb</h3>
+                    <h3>👾 Memory used (Vector) 👾 👉🏻 {mainHLLData.comparative.memory_vector} kb</h3>
+                    <h3>👾 Memory used (Set) 👾 👉🏻 {mainHLLData.comparative.memory_set} kb</h3>
+                    <br/><br/><br/>
+                    <h1>⏱️ Execution time (ms) ⏱️</h1>
+                    <Suspense fallback={<div>Loading...</div>}>
+                      <div className='graph-1'>
+                        <Bar options={options} data={dataTime} />
+                      </div>
+                    </Suspense>
+
+                    <br/><br/>
+                    <h3>⏱️ Execution time (HLL) ⏱️ 👉🏻 {mainHLLData.hll.time_hll} ms</h3>
+                    <h3>⏱️ Execution time (Vector) ⏱️ 👉🏻 {mainHLLData.comparative.time_vector} ms</h3>
+                    <h3>⏱️ Execution time (Set) ⏱️ 👉🏻 {mainHLLData.comparative.time_set} ms</h3>
+                </div>
               </div>
             </div>
         </div>

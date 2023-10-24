@@ -84,3 +84,16 @@ export const countCSVHLL = async (filename, column) => {
         console.log(error);
     }
 }
+
+export const countCSVCompare = async (filename, column) => {
+    try {
+        const pdata = {
+            "nombreArchivo": "../mock/" + filename,
+            "nombreColumna": column,
+        };
+        const { data } = await axios.post(linkAPI + "csv_comparation", pdata);
+        return data;
+    } catch (error) {
+        console.log(error);
+    }
+}

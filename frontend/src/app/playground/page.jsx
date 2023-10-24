@@ -2,25 +2,26 @@
 
 import './styles.css'
 import Circlegraph from '@/components/Circlegraph';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title } from 'chart.js';
-import { Doughnut, Line } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title} from 'chart.js';
+import { Doughnut, Bar } from 'react-chartjs-2';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { createHLL, insertHLL, infoHLL, resetHLL, countHLL, uploadHLLFile, listCSVFiles, countCSVHLL } from './functions';
+import { createHLL, insertHLL, infoHLL, resetHLL, countHLL, uploadHLLFile, listCSVFiles, countCSVHLL, countCSVCompare } from './functions';
+import { Suspense } from 'react';
 
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title);
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
 const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
-      },
-      title: {
-        display: false,
-      },
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'top',
     },
-  };
+    title: {
+      display: false,
+    },
+  },
+};
 
 const labels = ['HyperLogLog', 'Vector', 'Set'];
 
@@ -33,7 +34,9 @@ export default function Page() {
     const [upload, setUpload] = useState(false);
     const [filesList, setFilesList] = useState([]);
     const [selectedFile, setSelectedFile] = useState("MOCK_DATA.csv");
-    const [column, setColumn] = useState("");
+    const [column, setColumn] = useState("email");
+    const [isCreated, setCreated] = useState(false);
+    const [isPossibleCount, setPossibleCount] = useState(false);
 
     // States
     const [P, setP] = useState(4);
@@ -48,6 +51,8 @@ export default function Page() {
     const [CountSet, setCountSet] = useState(0.0);
     const [MemoryVector, setMemoryVector] = useState(0.0);
     const [MemorySet, setMemorySet] = useState(0.0);
+    const [TimeSet, setTimeSet] = useState(0.0);
+    const [TimeVector, setTimeVector] = useState(0.0);
 
     //main data
     const mainHLLData={
@@ -66,6 +71,8 @@ export default function Page() {
         memory_vector: MemoryVector,
         count_set: CountSet,
         count_vector: CountVector,
+        time_set: TimeSet,
+        time_vector: TimeVector,
       },
     }
 
@@ -96,8 +103,7 @@ export default function Page() {
       datasets: [
         {
           label: 'Execution time (ms)',
-          data: [434.52,360000.32,1423.42],
-          borderColor: 'rgb(255, 99, 132)',
+          data: [mainHLLData.hll.time_hll,mainHLLData.comparative.time_vector,mainHLLData.comparative.time_set],
           backgroundColor: 'rgba(255, 99, 132, 0.5)',
         },
       ],
@@ -144,21 +150,29 @@ export default function Page() {
 
         if (type === "create") {
           data = await createHLL(selectedP);
+          setCreated(true);
         } else if (type === "insert") {
           data = await insertHLL(value);
+          setPossibleCount(true);
+
         } else if (type === "info") {
           data = await infoHLL();
         } else if (type === "count"){
           data = await countHLL();
+          
         } else if (type === "reset"){
           data = await resetHLL();
+          setCreated(false);
+          setPossibleCount(false);
         } else if (type === "csv_hll"){
           data = await countCSVHLL(selectedFile, column);
+          setPossibleCount(false);
         } else {
-          
+          data = await countCSVCompare(selectedFile, column);
+          setPossibleCount(false);
         }
 
-        if (type !== "count" && type !== "csv_hll") {
+        if (type !== "count" && type !== "csv_hll" && type !== "comparative") {
           setP(data.info_hll.p);
           setM(data.info_hll.m);
           setAlpha(data.info_hll.alpha);
@@ -174,15 +188,19 @@ export default function Page() {
           setInsertedElements(data.hll.info_hll.total_inserted_elements);
           setCountHLL(data.hll.count_hll);
           setTimeHLL(data.hll.time_hll);
+        }
 
-          if (type !== "csv_hll"){
-            setPrecision(data.hll.precision);
-            setCountVector(data.comparative.info_comp.values_vector);
-            setCountSet(data.comparative.info_comp.values_set);
-            setMemoryVector(data.comparative.info_comp.memory_vector_kb);
-            setMemorySet(data.comparative.info_comp.memory_set_kb);
-          }
-          
+        if (type !== "csv_hll" && type !== "create" && type !== "insert" && type !== "info" && type !== "reset"){
+          setPrecision(data.hll.precision.toFixed(2));
+          setCountVector(data.comparative.info_comp.values_vector);
+          setCountSet(data.comparative.info_comp.values_set);
+          setMemoryVector(data.comparative.info_comp.memory_vector_kb);
+          setMemorySet(data.comparative.info_comp.memory_set_kb);
+        }
+
+        if (type === "comparative"){
+          setTimeSet(data.comparative.time_set);
+          setTimeVector(data.comparative.time_vector);
         }
 
         setOperation(type);
@@ -216,74 +234,74 @@ export default function Page() {
                   <button type="button" onClick={operationHLL('create')}>Create</button>
               </div>
 
+              <div className={`after-create ${isCreated ? "":"nonactive"}`}> 
+                <h1>Insert elements to HLL here ⚡</h1>
+                <div className='new-hll'>
+                  <h2>Write any value to insert ➡️ </h2>
+                  <input
+                    type="text"
+                    name="insert"
+                    id="insert"
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                  />
+                </div>
+                <div className='create-controls skyblue'>
+                    <button type="button" onClick={operationHLL('insert')}>Insert</button>
+                </div>
 
-              <h1>Insert elements to HLL here ⚡</h1>
-              <div className='new-hll'>
-                <h2>Write any value to insert ➡️ </h2>
-                <input
-                  type="text"
-                  name="insert"
-                  id="insert"
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                />
-              </div>
-              <div className='create-controls skyblue'>
-                  <button type="button" onClick={operationHLL('insert')}>Insert</button>
-              </div>
+                <h1>Get information about your HLL object here 📢</h1>
+                <div className='create-controls yellow'>
+                    <button type="button" onClick={operationHLL('info')}>Get it</button>
+                </div>
+                
+                <h1 className={`${mainHLLData.hll.insertedElements > 0 && isPossibleCount === true ? "":"nonactive"}`}>Count the elements of your HLL here ✨</h1>
+                <div className={`create-controls purple ${mainHLLData.hll.insertedElements > 0 && isPossibleCount === true ? "":"nonactive"}`}>
+                    <button type="button" onClick={operationHLL('count')}>Count now</button>
+                </div>
 
-              <h1>Get information about your HLL object here 📢</h1>
-              <div className='create-controls yellow'>
-                  <button type="button" onClick={operationHLL('info')}>Get it</button>
-              </div>
+                <h1>Upload a new .csv file to count different elements from that here 📄</h1>
+                <div className='create-controls green'>
+                  <input type="file" id="file" name="file" accept=".csv" onChange={uploadCSV} />
+                  <label htmlFor="file" id="file-label">Upload csv</label>
+                  <span className={`selected-file-name ${upload ? "" : "nonupload"}`}>
+                    {upload ? "The file was uploaded successfully" : "Any .csv file uploaded yet"}
+                  </span>
+                </div>
 
-              <h1>Count the elements of your HLL here ✨</h1>
-              <div className='create-controls purple'>
-                  <button type="button" onClick={operationHLL('count')}>Count now</button>
-              </div>
+                <h1>Or select a .csv File from our repository, select a Column Name and see the magic here 🔥</h1>
+                <div className='new-hll'>
+                  <h2>Select a &quot;.csv&quot; file ➡️ </h2>
+                  <select name="file" id="file" value={selectedFile} onChange={(e) => setSelectedFile(e.target.value)}>
+                    {filesList.map((value) => (
+                      <option key={value} value={value}>{value}</option>
+                    ))}
+                    </select>
+                </div>
+                <div className='new-hll'>
+                  <h2>Write the name of the column ➡️ </h2>
+                  <input
+                    className='green-input'
+                    type="text"
+                    name="insert"
+                    id="insert"
+                    value={column}
+                    onChange={(e) => setColumn(e.target.value)}
+                  />
+                </div>
+                <div className='create-controls'>
+                    <button type="button" onClick={operationHLL('csv_hll')}>Count HLL</button>
+                </div>
+                
+                <div className='create-controls'>
+                  <button type="button" onClick={operationHLL('comparative')}>Compare count</button>
+                </div>
 
-              <h1>Upload a new .csv file to count different elements from that here 📄</h1>
-              <div className='create-controls green'>
-                <input type="file" id="file" name="file" accept=".csv" onChange={uploadCSV} />
-                <label htmlFor="file" id="file-label">Upload csv</label>
-                <span className={`selected-file-name ${upload ? "" : "nonupload"}`}>
-                  {upload ? "The file was uploaded successfully" : "Any .csv file uploaded yet"}
-                </span>
+                <h1>Reset your HLL here 🫧</h1>
+                <div className='create-controls red'>
+                    <button type="button" onClick={operationHLL('reset')}>Reset now</button>
+                </div>
               </div>
-
-              <h1>Or select a .csv File from our repository, select a Column Name and see the magic here 🔥</h1>
-              <div className='new-hll'>
-                <h2>Select a &quot;.csv&quot; file ➡️ </h2>
-                <select name="file" id="file" value={selectedFile} onChange={(e) => setSelectedFile(e.target.value)}>
-                  {filesList.map((value) => (
-                    <option key={value} value={value}>{value}</option>
-                  ))}
-                  </select>
-              </div>
-              <div className='new-hll'>
-                <h2>Write the name of the column ➡️ </h2>
-                <input
-                  className='green-input'
-                  type="text"
-                  name="insert"
-                  id="insert"
-                  value={column}
-                  onChange={(e) => setColumn(e.target.value)}
-                />
-              </div>
-              <div className='create-controls'>
-                  <button type="button" onClick={operationHLL('csv_hll')}>Count HLL</button>
-              </div>
-              
-              <div className='create-controls'>
-                <button type="button" onClick={operationHLL('csv_hll')}>Compare count</button>
-              </div>
-
-              <h1>Reset your HLL here 🫧</h1>
-              <div className='create-controls red'>
-                  <button type="button" onClick={operationHLL('reset')}>Reset now</button>
-              </div>
-
             </div>
 
             <div className='graphic-panel'>
@@ -428,7 +446,7 @@ export default function Page() {
                     </div>
                   
                   <h1>⏱️ Execution time (HLL)⏱️</h1>
-                  <h1>👉🏻 0.52 ms</h1>
+                  <h1>👉🏻 {mainHLLData.hll.time_hll} ms</h1>
 
                   <br/><br/>
                         <Image 
@@ -439,21 +457,33 @@ export default function Page() {
                         />
               </div>
 
-              <div className='comparative nonactive'>
-                  <h3>Total count of elements: {mainHLLData.insertedElements}</h3>
+              <div className={`comparative ${(operationType === "comparative") ? "":"nonactive"}`}>
+                  <h3>Total elements inserted: {mainHLLData.hll.insertedElements}</h3>
+                  <h3>Total different elements inserted: {mainHLLData.comparative.count_set}</h3>
                   <h1>⬇️ Total count of HyperLogLog ⬇️</h1>
-                  <h1>👉🏻 99872.423 elements</h1>
-                  <Circlegraph percentage={79.82} color={"skyblue"} message = {`${79.82}% accuracy compared to <vector> and <set> structures`}/>
+                  <h1>👉🏻 {mainHLLData.hll.count_hll} elements</h1>
+                  <Circlegraph percentage={mainHLLData.hll.precision} color={"skyblue"} message = {`${mainHLLData.hll.precision}% accuracy compared to <vector> and <set> structures`}/>
                   <br/><br/>
                   <h1>👾 Memory used (kb) 👾</h1>
                   <div className='graph-1'>
                       <Doughnut data={dataMemory} />
                   </div>
-                  <br/><br/>
+                  <br/>
+                  <h3>👾 Memory used (HLL) 👾 👉🏻 {mainHLLData.hll.memory} kb</h3>
+                  <h3>👾 Memory used (Vector) 👾 👉🏻 {mainHLLData.comparative.memory_vector} kb</h3>
+                  <h3>👾 Memory used (Set) 👾 👉🏻 {mainHLLData.comparative.memory_set} kb</h3>
+                  <br/><br/><br/>
                   <h1>⏱️ Execution time (ms) ⏱️</h1>
-                  <div className='graph-1'>
-                      <Line options={options} data={dataTime} />;
-                  </div>
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <div className='graph-1'>
+                      <Bar options={options} data={dataTime} />
+                    </div>
+                  </Suspense>
+
+                  <br/><br/>
+                  <h3>⏱️ Execution time (HLL) ⏱️ 👉🏻 {mainHLLData.hll.time_hll} ms</h3>
+                  <h3>⏱️ Execution time (Vector) ⏱️ 👉🏻 {mainHLLData.comparative.time_vector} ms</h3>
+                  <h3>⏱️ Execution time (Set) ⏱️ 👉🏻 {mainHLLData.comparative.time_set} ms</h3>
               </div>
             </div>
         </div>

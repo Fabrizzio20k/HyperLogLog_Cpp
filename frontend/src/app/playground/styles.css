@@ -34,7 +34,13 @@
 .control-panel h1{
     text-align: left;
     font-weight: bold;
-    font-size: 2em;
+    font-size: 1.5em;
+}
+
+.control-panel h2{
+    text-align: left;
+    font-weight: normal;
+    font-size: 1.1em;
 }
 
 .new-hll {
@@ -54,7 +60,7 @@
     background-color: #041f12;
     border-radius: 5px;
     border: 2px solid #ccc;
-    font-weight: bold;
+    font-weight: normal;
     color: white;
 }
   
@@ -68,7 +74,7 @@
     background-color: #04171f;
     border-radius: 5px;
     border: 2px solid #ccc;
-    font-weight: bold;
+    font-weight: normal;
     color: white;
 }
 
@@ -93,12 +99,13 @@
     cursor: pointer;
     background-color: #003021;
     color: white;
-    width: 25%;
-    height: 50px;
+    width: auto;
+    height: auto;
     border-radius: 5px;
     border: 2px solid #00ffaa;
-    font-size: 16px;
+    font-size: 14px;
     transition: 0.5s;
+    padding: 10px 20px;
 }
 
 .create-controls input[type="file"] {
@@ -111,15 +118,15 @@
     cursor: pointer;
     background-color: #003021;
     color: white;
-    width: 25%;
-    height: 50px;
+    width: auto;
+    height: auto;
     border-radius: 5px;
     border: 2px solid #00ffaa;
-    font-size: 16px;
+    font-size: 14px;
     transition: 0.5s;
     display: inline-block;
     text-align: center;
-    line-height: 50px;
+    padding: 10px 20px;
 }
 
 .create-controls span{
@@ -212,6 +219,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    font-size: 0.8em;
 }
 
 .create{

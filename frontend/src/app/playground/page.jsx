@@ -334,8 +334,8 @@ export default function Page() {
                         <Image 
                           src='/new_file.png'
                           alt='structure'
-                          width={300}
-                          height={300}
+                          width={200}
+                          height={200}
                         />
                     </div>
 

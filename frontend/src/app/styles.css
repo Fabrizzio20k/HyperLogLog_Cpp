@@ -11,5 +11,23 @@ body {
   justify-content: center;
 }
 
+::-webkit-scrollbar {
+  width: 12px; /* Ancho de la barra de desplazamiento vertical */
+}
+
+::-webkit-scrollbar-track {
+  background: #000000; /* Color de fondo de la pista de desplazamiento */
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888; /* Color de la barra de desplazamiento */
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Color de la barra de desplazamiento al pasar el ratón por encima */
+}
+
 
 

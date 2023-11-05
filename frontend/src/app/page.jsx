@@ -14,7 +14,7 @@ export default function Page() {
 
     return (
         <div className="mainInformation">
-            <Image src="/hll_logo.png" alt="logo" width={500} height={500} className='img2'/>
+            <Image src="/hll_logo.png" alt="logo" width={300} height={300} className='img2'/>
             <h1>HyperLogLog C++</h1>
             <p>
                 This is one of the best implementations of HyperLogLog structure, 

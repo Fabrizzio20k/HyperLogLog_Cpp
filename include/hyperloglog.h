@@ -19,7 +19,7 @@ class HyperLogLog
 private:
     int p;         // Valor de precision de acuerdo al paper
     int m;         // 2^p buckets a crear de acuerdo al paper - cantidad total de buckets
-    vector<int> M; // Vector de buckets
+    int* M; // Vector de buckets
     double alpha;  // Valor de correccion de acuerdo al paper
 
     long long total_inserted_elements;
@@ -67,7 +67,7 @@ public:
         }
         this->p = _p;                // Valor de precision
         this->m = 1 << p;            // 2^p buckets, movemos 1 p veces a la izquierda para obtener el valor de 2^p
-        this->M = vector<int>(m, 0); // Inicializamos el vector de buckets con 0
+        this->M = new int[m](); // Inicializamos el vector de buckets con 0
         this->total_inserted_elements = 0; // Inicializamos la cantidad de elementos insertados, no es necesario incluir esto
 
         alpha = (m == 16) ? 0.673 : (m == 32) ? 0.697
@@ -210,8 +210,13 @@ public:
         return info;
     }
 
-    double get_memory(){
-        return  (double)(sizeof(M[0]) * M.size() + sizeof(M))/1000;
+    [[nodiscard]] double get_memory() const{
+        return  (double) m * sizeof(int) / 1000;
+    }
+
+    ~HyperLogLog()
+    {
+        delete[] M;
     }
 };
 

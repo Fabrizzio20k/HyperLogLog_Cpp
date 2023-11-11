@@ -236,7 +236,7 @@ Api::Api() {
 
         hll->count_from_csv(nombreArchivo, nombreColumna);
 
-        double time_vector = comp->count_from_csv_vector(nombreArchivo, nombreColumna);
+        double time_vector = comp->count_from_csv_chainHash(nombreArchivo, nombreColumna);
         double time_set = comp->count_from_csv_set(nombreArchivo, nombreColumna);
 
         crow::json::wvalue response;

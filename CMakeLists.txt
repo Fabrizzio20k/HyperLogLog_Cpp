@@ -17,4 +17,5 @@ add_executable(HyperLogLog_Cpp
         include/api.h
         lib/Crow/crow/middlewares/cors.h
         lib/avl/avl.h
-        lib/avl/node.h)
+        lib/avl/node.h
+        lib/chainHash/chainHash.h)

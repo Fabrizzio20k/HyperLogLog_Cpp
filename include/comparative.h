@@ -1,54 +1,37 @@
 #ifndef HYPERLOGLOG_CPP_COMPARATIVE_H
 #define HYPERLOGLOG_CPP_COMPARATIVE_H
 
-#include <vector>
 #include <string>
 #include <map>
-#include <set>
 #include "avl/avl.h"
+#include "chainHash/chainHash.h"
 
 using namespace std;
 
 class comparative{
 private:
-    vector<string> values;
-    set<string> set_values;
     AVLTree<string> avl_tree;
-
-    void insert_diferent(const string& value){
-        bool is_diferent = true;
-        for (const auto& i: values){
-            if (i == value){
-                is_diferent = false;
-                break;
-            }
-        }
-        if (is_diferent){
-            values.push_back(value);
-        }
-    }
+    ChainHash<string, string> chain_hash;
 
 public:
     comparative() = default;
     void insert(const string& value){
-        insert_diferent(value);
-        set_values.insert(value);
         avl_tree.insert(value);
+        chain_hash.insert(value, value);
     }
     void clear(){
-        values.clear();
-        set_values.clear();
         avl_tree.clear();
+        chain_hash.clear();
     }
 
-    double count_from_csv_vector(const string& nombreArchivo, const string& nombreColumna){
+    double count_from_csv_chainHash(const string& nombreArchivo, const string& nombreColumna){
 
         chrono::high_resolution_clock::time_point start_time;
         chrono::high_resolution_clock::time_point end_time;
 
         start_time = std::chrono::high_resolution_clock::now();
 
-        values.clear();
+        chain_hash.clear();
 
         ifstream archivo(nombreArchivo);
         if (!archivo.is_open()) {
@@ -85,7 +68,7 @@ public:
             for (int i = 0; i <= indiceColumna; i++) {
                 getline(ss_2, valor, ',');
             }
-            insert_diferent(valor);
+            chain_hash.insert(valor, valor);
         }
 
         archivo.close();
@@ -163,22 +146,21 @@ public:
 
     map<string, size_t> get_info_size(){
         map<string, size_t> info;
-        info["values_vector"] = values.size();
+        info["values_vector"] = chain_hash.getSize();
         info["values_set"] = avl_tree.size();
         return info;
     }
 
     map<string, double> get_info_memory(){
         map<string, double> info;
-        info["memory_vector_kb"] = (double) (sizeof(string) * values.size() + sizeof(values))/1000;
+        info["memory_vector_kb"] = chain_hash.getMemoryUsedKB();
         info["memory_set_kb"] = avl_tree.getMemoryUsedKB();
         return info;
     }
 
     ~comparative(){
-        values.clear();
-        set_values.clear();
         avl_tree.clear();
+        chain_hash.clear();
     }
 
 };

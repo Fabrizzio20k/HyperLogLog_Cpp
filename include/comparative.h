@@ -3,8 +3,9 @@
 
 #include <vector>
 #include <string>
-#include <set>
 #include <map>
+#include <set>
+#include "avl/avl.h"
 
 using namespace std;
 
@@ -12,6 +13,7 @@ class comparative{
 private:
     vector<string> values;
     set<string> set_values;
+    AVLTree<string> avl_tree;
 
     void insert_diferent(const string& value){
         bool is_diferent = true;
@@ -31,10 +33,12 @@ public:
     void insert(const string& value){
         insert_diferent(value);
         set_values.insert(value);
+        avl_tree.insert(value);
     }
     void clear(){
         values.clear();
         set_values.clear();
+        avl_tree.clear();
     }
 
     double count_from_csv_vector(const string& nombreArchivo, const string& nombreColumna){
@@ -102,7 +106,7 @@ public:
 
         start_time = std::chrono::high_resolution_clock::now();
 
-        set_values.clear();
+        avl_tree.clear();
 
         ifstream archivo(nombreArchivo);
         if (!archivo.is_open()) {
@@ -139,7 +143,7 @@ public:
             for (int i = 0; i <= indiceColumna; i++) {
                 getline(ss_2, valor, ',');
             }
-            set_values.insert(valor);
+            avl_tree.insert(valor);
         }
 
         archivo.close();
@@ -160,20 +164,21 @@ public:
     map<string, size_t> get_info_size(){
         map<string, size_t> info;
         info["values_vector"] = values.size();
-        info["values_set"] = set_values.size();
+        info["values_set"] = avl_tree.size();
         return info;
     }
 
     map<string, double> get_info_memory(){
         map<string, double> info;
         info["memory_vector_kb"] = (double) (sizeof(string) * values.size() + sizeof(values))/1000;
-        info["memory_set_kb"] = (double) (sizeof(string) * set_values.size() + sizeof(set_values))/1000;
+        info["memory_set_kb"] = avl_tree.getMemoryUsedKB();
         return info;
     }
 
     ~comparative(){
         values.clear();
         set_values.clear();
+        avl_tree.clear();
     }
 
 };

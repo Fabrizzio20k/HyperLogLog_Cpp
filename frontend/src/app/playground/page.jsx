@@ -23,7 +23,7 @@ const options = {
   },
 };
 
-const labels = ['HyperLogLog', 'Vector', 'AVL Tree'];
+const labels = ['HyperLogLog', 'Hash Table', 'AVL Tree'];
 
 export default function Page() {
 
@@ -52,8 +52,8 @@ export default function Page() {
     const [CountSet, setCountSet] = useState(0.0);
     const [MemoryVector, setMemoryVector] = useState(0.0);
     const [MemorySet, setMemorySet] = useState(0.0);
-    const [TimeSet, setTimeSet] = useState(0.0);
-    const [TimeVector, setTimeVector] = useState(0.0);
+    const [TimeAVL, setTimeAVL] = useState(0.0);
+    const [TimeHash, setTimeHash] = useState(0.0);
 
     //main data
     const mainHLLData={
@@ -72,8 +72,8 @@ export default function Page() {
         memory_vector: MemoryVector,
         count_set: CountSet,
         count_vector: CountVector,
-        time_set: TimeSet,
-        time_vector: TimeVector,
+        time_avl: TimeAVL,
+        time_hash: TimeHash,
       },
     }
 
@@ -104,7 +104,7 @@ export default function Page() {
       datasets: [
         {
           label: 'Execution time (ms)',
-          data: [mainHLLData.hll.time_hll,mainHLLData.comparative.time_vector,mainHLLData.comparative.time_set],
+          data: [mainHLLData.hll.time_hll,mainHLLData.comparative.time_hash,mainHLLData.comparative.time_avl],
           backgroundColor: 'rgba(255, 99, 132, 0.5)',
         },
       ],
@@ -214,8 +214,8 @@ export default function Page() {
         }
 
         if (type === "comparative"){
-          setTimeSet(data.comparative.time_set);
-          setTimeVector(data.comparative.time_vector);
+          setTimeAVL(data.comparative.time_set);
+          setTimeHash(data.comparative.time_vector);
         }
 
         setOperation(type);
@@ -437,7 +437,7 @@ export default function Page() {
                     <h3>Total different elements inserted: {mainHLLData.comparative.count_set}</h3>
                     <h1>⬇️ Total count of HyperLogLog ⬇️</h1>
                     <h1>👉🏻 {mainHLLData.hll.count_hll} elements</h1>
-                    <Circlegraph percentage={mainHLLData.hll.precision} color={"skyblue"} message = {`${mainHLLData.hll.precision}% accuracy compared to <vector> and <AVL Tree> structures`}/>
+                    <Circlegraph percentage={mainHLLData.hll.precision} color={"skyblue"} message = {`${mainHLLData.hll.precision}% accuracy compared to <Hash Table> and <AVL Tree> structures`}/>
                     <br/><br/>
                     <h1>👾 Memory used (kb) 👾</h1>
                     <div className='graph-1'>
@@ -445,7 +445,7 @@ export default function Page() {
                     </div>
                     <br/>
                     <h3>👾 Memory used (HLL) 👾 👉🏻 {mainHLLData.hll.memory} kb</h3>
-                    <h3>👾 Memory used (Vector) 👾 👉🏻 {mainHLLData.comparative.memory_vector} kb</h3>
+                    <h3>👾 Memory used (Hash Table) 👾 👉🏻 {mainHLLData.comparative.memory_vector} kb</h3>
                     <h3>👾 Memory used (AVL Tree) 👾 👉🏻 {mainHLLData.comparative.memory_set} kb</h3>
                     <br/><br/>
                     <h1>⏱️ Execution time (HLL)⏱️</h1>
@@ -487,7 +487,7 @@ export default function Page() {
                     <h3>Total different elements inserted: {mainHLLData.comparative.count_set}</h3>
                     <h1>⬇️ Total count of HyperLogLog ⬇️</h1>
                     <h1>👉🏻 {mainHLLData.hll.count_hll} elements</h1>
-                    <Circlegraph percentage={mainHLLData.hll.precision} color={"skyblue"} message = {`${mainHLLData.hll.precision}% accuracy compared to <vector> and <AVL Tree> structures`}/>
+                    <Circlegraph percentage={mainHLLData.hll.precision} color={"skyblue"} message = {`${mainHLLData.hll.precision}% accuracy compared to <Hash Table> and <AVL Tree> structures`}/>
                     <br/><br/>
                     <h1>👾 Memory used (kb) 👾</h1>
                     <div className='graph-1'>
@@ -495,7 +495,7 @@ export default function Page() {
                     </div>
                     <br/>
                     <h3>👾 Memory used (HLL) 👾 👉🏻 {mainHLLData.hll.memory} kb</h3>
-                    <h3>👾 Memory used (Vector) 👾 👉🏻 {mainHLLData.comparative.memory_vector} kb</h3>
+                    <h3>👾 Memory used (Hash Table) 👾 👉🏻 {mainHLLData.comparative.memory_vector} kb</h3>
                     <h3>👾 Memory used (AVL Tree) 👾 👉🏻 {mainHLLData.comparative.memory_set} kb</h3>
                     <br/><br/><br/>
                     <h1>⏱️ Execution time (ms) ⏱️</h1>
@@ -507,8 +507,8 @@ export default function Page() {
 
                     <br/><br/>
                     <h3>⏱️ Execution time (HLL) ⏱️ 👉🏻 {mainHLLData.hll.time_hll} ms</h3>
-                    <h3>⏱️ Execution time (Vector) ⏱️ 👉🏻 {mainHLLData.comparative.time_vector} ms</h3>
-                    <h3>⏱️ Execution time (AVL Tree) ⏱️ 👉🏻 {mainHLLData.comparative.time_set} ms</h3>
+                    <h3>⏱️ Execution time (Hash Table) ⏱️ 👉🏻 {mainHLLData.comparative.time_hash} ms</h3>
+                    <h3>⏱️ Execution time (AVL Tree) ⏱️ 👉🏻 {mainHLLData.comparative.time_avl} ms</h3>
                 </div>
               </div>
             </div>

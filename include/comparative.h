@@ -158,7 +158,7 @@ public:
     }
 
     size_t get_count(){
-        return set_values.size();
+        return avl_tree.size();
     }
 
     map<string, size_t> get_info_size(){

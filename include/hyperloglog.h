@@ -211,7 +211,7 @@ public:
     }
 
     [[nodiscard]] double get_memory() const{
-        return  (double) m * sizeof(int) / 1000;
+        return  (double) m * sizeof(int) / 1024;
     }
 
     ~HyperLogLog()

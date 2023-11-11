@@ -23,7 +23,7 @@ const options = {
   },
 };
 
-const labels = ['HyperLogLog', 'Vector', 'Set'];
+const labels = ['HyperLogLog', 'Vector', 'AVL Tree'];
 
 export default function Page() {
 
@@ -82,7 +82,7 @@ export default function Page() {
       labels,
       datasets: [
         {
-          label: 'Memory (kb)',
+          label: 'Memory (Kb)',
           data: [mainHLLData.hll.memory, mainHLLData.comparative.memory_vector, mainHLLData.comparative.memory_set],
           backgroundColor: [
             'rgba(0, 195, 255, 0.2)',
@@ -437,7 +437,7 @@ export default function Page() {
                     <h3>Total different elements inserted: {mainHLLData.comparative.count_set}</h3>
                     <h1>⬇️ Total count of HyperLogLog ⬇️</h1>
                     <h1>👉🏻 {mainHLLData.hll.count_hll} elements</h1>
-                    <Circlegraph percentage={mainHLLData.hll.precision} color={"skyblue"} message = {`${mainHLLData.hll.precision}% accuracy compared to <vector> and <set> structures`}/>
+                    <Circlegraph percentage={mainHLLData.hll.precision} color={"skyblue"} message = {`${mainHLLData.hll.precision}% accuracy compared to <vector> and <AVL Tree> structures`}/>
                     <br/><br/>
                     <h1>👾 Memory used (kb) 👾</h1>
                     <div className='graph-1'>
@@ -446,7 +446,7 @@ export default function Page() {
                     <br/>
                     <h3>👾 Memory used (HLL) 👾 👉🏻 {mainHLLData.hll.memory} kb</h3>
                     <h3>👾 Memory used (Vector) 👾 👉🏻 {mainHLLData.comparative.memory_vector} kb</h3>
-                    <h3>👾 Memory used (Set) 👾 👉🏻 {mainHLLData.comparative.memory_set} kb</h3>
+                    <h3>👾 Memory used (AVL Tree) 👾 👉🏻 {mainHLLData.comparative.memory_set} kb</h3>
                     <br/><br/>
                     <h1>⏱️ Execution time (HLL)⏱️</h1>
                     <h1>👉🏻 {mainHLLData.hll.time_hll} ms</h1>
@@ -487,7 +487,7 @@ export default function Page() {
                     <h3>Total different elements inserted: {mainHLLData.comparative.count_set}</h3>
                     <h1>⬇️ Total count of HyperLogLog ⬇️</h1>
                     <h1>👉🏻 {mainHLLData.hll.count_hll} elements</h1>
-                    <Circlegraph percentage={mainHLLData.hll.precision} color={"skyblue"} message = {`${mainHLLData.hll.precision}% accuracy compared to <vector> and <set> structures`}/>
+                    <Circlegraph percentage={mainHLLData.hll.precision} color={"skyblue"} message = {`${mainHLLData.hll.precision}% accuracy compared to <vector> and <AVL Tree> structures`}/>
                     <br/><br/>
                     <h1>👾 Memory used (kb) 👾</h1>
                     <div className='graph-1'>
@@ -496,7 +496,7 @@ export default function Page() {
                     <br/>
                     <h3>👾 Memory used (HLL) 👾 👉🏻 {mainHLLData.hll.memory} kb</h3>
                     <h3>👾 Memory used (Vector) 👾 👉🏻 {mainHLLData.comparative.memory_vector} kb</h3>
-                    <h3>👾 Memory used (Set) 👾 👉🏻 {mainHLLData.comparative.memory_set} kb</h3>
+                    <h3>👾 Memory used (AVL Tree) 👾 👉🏻 {mainHLLData.comparative.memory_set} kb</h3>
                     <br/><br/><br/>
                     <h1>⏱️ Execution time (ms) ⏱️</h1>
                     <Suspense fallback={<div>Loading...</div>}>
@@ -508,7 +508,7 @@ export default function Page() {
                     <br/><br/>
                     <h3>⏱️ Execution time (HLL) ⏱️ 👉🏻 {mainHLLData.hll.time_hll} ms</h3>
                     <h3>⏱️ Execution time (Vector) ⏱️ 👉🏻 {mainHLLData.comparative.time_vector} ms</h3>
-                    <h3>⏱️ Execution time (Set) ⏱️ 👉🏻 {mainHLLData.comparative.time_set} ms</h3>
+                    <h3>⏱️ Execution time (AVL Tree) ⏱️ 👉🏻 {mainHLLData.comparative.time_set} ms</h3>
                 </div>
               </div>
             </div>

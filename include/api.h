@@ -4,6 +4,7 @@
 #include "Crow/crow.h"
 #include "hyperloglog.h"
 #include "comparative.h"
+#include "Crow/crow/middlewares/cors.h"
 
 class Api {
     public:
@@ -12,10 +13,21 @@ class Api {
         HyperLogLog* hll = nullptr;
         comparative* comp = nullptr;
     private:
-        crow::SimpleApp app;
+        crow::App<crow::CORSHandler> app;
 };
 
 Api::Api() {
+    auto cors = app.get_middleware<crow::CORSHandler>();
+
+    cors
+            .global()
+            .headers("X-Custom-Header", "Upgrade-Insecure-Requests")
+            .methods("POST"_method, "GET"_method)
+            .prefix("/cors")
+            .origin("example.com")
+            .prefix("/nocors")
+            .ignore();
+
     CROW_ROUTE(app, "/api/v1/hyperloglog/create").methods("POST"_method)
     ([this](const crow::request& req) {
         auto json = crow::json::load(req.body);

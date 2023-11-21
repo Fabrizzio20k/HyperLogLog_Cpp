@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const linkAPI = "http://18.211.189.214:5000/api/v1/hyperloglog/";
-const linkUpload = "http://localhost:5001/"
+const linkUpload = "http://18.211.189.214:5001/"
 
 export const createHLL = async (p) => {
     try {

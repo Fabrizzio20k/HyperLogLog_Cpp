@@ -43,4 +43,12 @@ npm install
 npm run dev
 ```
 
-You have to install any chrome extension to allow CORS. I recommend [this one](https://chrome.google.com/webstore/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino).
+## Web preview
+
+![Preview 1](/img/1.png)
+![Preview 2](/img/2.png)
+![Preview 3](/img/3.png)
+![Preview 4](/img/4.png)
+![Preview 5](/img/5.png)
+![Preview 6](/img/6.png)
+
